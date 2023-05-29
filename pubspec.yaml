@@ -1,0 +1,50 @@
+name: passtop
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.2 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.2
+  get: ^4.6.5
+  supabase_flutter: ^1.10.0
+  flutter_native_splash: ^2.3.0
+  flutter_screenutil: ^5.8.2
+  flutter_svg: ^2.0.6
+  animate_do: ^3.0.2
+  flutter_remix: ^0.0.3
+  loading_animation_widget: ^1.2.0+4
+  flutter_dotenv: ^5.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/fonts/
+    - assets/images/
+
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
