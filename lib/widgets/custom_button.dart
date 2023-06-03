@@ -23,7 +23,7 @@ class CustomButton extends StatelessWidget {
   final Widget icon;
   final bool hasIcon;
   final double marginBottom;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

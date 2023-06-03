@@ -12,16 +12,27 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.2
-  get: ^4.6.5
-  supabase_flutter: ^1.10.0
-  flutter_native_splash: ^2.3.0
-  flutter_screenutil: ^5.8.2
+
+  # UI
   flutter_svg: ^2.0.6
   animate_do: ^3.0.2
   flutter_remix: ^0.0.3
   loading_animation_widget: ^1.2.0+4
+  cached_network_image: ^3.2.3
+  shimmer: ^3.0.0
+  flutter_easyloading: ^3.0.5
+  flutter_native_splash: ^2.3.0
+  custom_navigation_bar: ^0.8.2
+
+  # Backend
+  supabase_flutter: ^1.10.0
+
+  # State Management
+  get: ^4.6.5
+
+  # Utils
+  flutter_screenutil: ^5.8.2
   flutter_dotenv: ^5.0.2
 
 dev_dependencies:

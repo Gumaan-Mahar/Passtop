@@ -1,12 +1,12 @@
 import '../../core/imports/core_imports.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class WatchTowerScreen extends StatelessWidget {
+  const WatchTowerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Center(
-      child: Text('Home screen'),
+      child: Text('Watch tower screen'),
     );
   }
 }

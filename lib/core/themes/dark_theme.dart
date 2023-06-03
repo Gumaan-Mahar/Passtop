@@ -2,8 +2,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../imports/core_imports.dart';
 
+
 final ThemeData darkTheme = ThemeData.dark().copyWith(
-  useMaterial3: true,
+  useMaterial3: false,
   brightness: Brightness.dark,
   primaryColor: AppColors.primaryColor,
   scaffoldBackgroundColor: AppColors.customDarkColor,
@@ -79,14 +80,14 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: const BorderSide(
-        color: AppColors.primaryColorShade800,
+        color: AppColors.primaryColorShade50,
         width: 1.0,
       ),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: const BorderSide(
-        color: AppColors.primaryColorShade50,
+        color: AppColors.primaryColorShade800,
         width: 1.0,
       ),
     ),
