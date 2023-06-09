@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     required this.hintText,
     required this.controller,
+    this.maxLength = 25,
     required this.focusNode,
     required this.keyboardType,
     required this.isPasswordVisible,
@@ -21,6 +22,7 @@ class CustomTextField extends StatelessWidget {
   });
   final String hintText;
   final TextEditingController controller;
+  final int maxLength;
   final FocusNode focusNode;
   final IconData prefixIcon;
   final bool isPassword;
@@ -45,12 +47,19 @@ class CustomTextField extends StatelessWidget {
             : isPassword
                 ? TextInputType.visiblePassword
                 : keyboardType,
-        style: context.theme.textTheme.labelMedium,
-        cursorColor: AppColors.shadeLight,
-        cursorWidth: 3,
+        style: context.theme.textTheme.labelMedium!.copyWith(
+          decoration: TextDecoration.none,
+          decorationThickness: 0.0,
+        ),
+        cursorColor: AppColors.primaryColor,
+        cursorWidth: 2.w,
+        cursorHeight: 18.h,
+        strutStyle: StrutStyle(height: 1.3.h, forceStrutHeight: true),
+        maxLength: maxLength,
         decoration: InputDecoration(
           filled: context.theme.inputDecorationTheme.filled,
           fillColor: context.theme.inputDecorationTheme.fillColor,
+          counterText: '',
           hintText: hintText,
           hintStyle: context.theme.inputDecorationTheme.hintStyle,
           errorStyle: context.theme.inputDecorationTheme.errorStyle,

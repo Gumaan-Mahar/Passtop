@@ -5,8 +5,10 @@ class WatchTowerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Watch tower screen'),
+    return const Scaffold(
+      body: Center(
+        child: Text('Watch tower screen'),
+      ),
     );
   }
 }

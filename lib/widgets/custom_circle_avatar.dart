@@ -11,12 +11,14 @@ class CustomCircleAvatar extends StatelessWidget {
     this.width,
     this.height,
     this.iconSize,
+    this.borderColor = AppColors.primaryColor,
   });
 
   final String profileUrl;
   final double? width;
   final double? height;
   final double? iconSize;
+  final Color borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +29,18 @@ class CustomCircleAvatar extends StatelessWidget {
       margin: EdgeInsets.only(right: 6.w, top: 2.h),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.primaryColor, width: 2.5),
+        border: Border.all(color: borderColor, width: 2.5),
         color: Colors.transparent,
       ),
       child: Container(
+        width: width ?? 38.w,
+      height: height ?? 38.h,
         decoration: BoxDecoration(
           image: profileUrl.isNotEmpty
               ? DecorationImage(
                   image: CachedNetworkImageProvider(profileUrl),
                   fit: BoxFit.cover)
               : null,
-          // border: Border.all(
-          //     color: primaryColor.withOpacity(0.5), width: 8.0),
           shape: BoxShape.circle,
         ),
         child: profileUrl.isEmpty

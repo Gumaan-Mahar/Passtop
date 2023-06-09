@@ -2,15 +2,15 @@ import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 
 class SetupAppLockController extends GetxController {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
-  FocusNode passwordFocusNode = FocusNode();
-  FocusNode confirmPasswordFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+  final FocusNode confirmPasswordFocusNode = FocusNode();
 
-  RxBool isContinueButtonLoading = false.obs;
+  final RxBool isContinueButtonLoading = false.obs;
 
   @override
   void dispose() {

@@ -25,14 +25,14 @@ class MainController extends GetxController {
     ).subscribe();
   }
 
-  List<Widget> screens = const [
+  final List<Widget> screens = const [
     HomeScreen(),
     SearchScreen(),
     WatchTowerScreen(),
     SettingsScreen(),
   ];
 
-  RxInt selectedNavBarTabIndex = 0.obs;
+  final RxInt selectedNavBarTabIndex = 0.obs;
 
   @override
   void dispose() async {

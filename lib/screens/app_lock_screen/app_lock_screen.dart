@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:passtop/controllers/applock_controller.dart';
 import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
@@ -20,6 +21,12 @@ class AppLockScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: context.theme.scaffoldBackgroundColor,
+        statusBarColor: context.theme.scaffoldBackgroundColor,
+      ),
+    );
     _signinController.isContinueButtonLoading.value = false;
     return SafeArea(
       child: Scaffold(

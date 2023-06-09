@@ -6,10 +6,10 @@ import '../core/imports/core_imports.dart';
 class AppLockController extends GetxController {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  TextEditingController passwordController = TextEditingController();
-  FocusNode passwordFocusNode = FocusNode();
+  final TextEditingController passwordController = TextEditingController();
+  final FocusNode passwordFocusNode = FocusNode();
 
-  RxBool isContinueButtonLoading = false.obs;
+  final RxBool isContinueButtonLoading = false.obs;
 
   @override
   void dispose() {

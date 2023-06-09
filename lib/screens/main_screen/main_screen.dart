@@ -1,9 +1,5 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:passtop/controllers/applock_controller.dart';
-import 'package:passtop/controllers/home_controller.dart';
-import 'package:passtop/main.dart';
-import 'package:passtop/screens/home_screen/home_screen.dart';
-import 'package:passtop/services/user_services.dart';
 
 import '../../controllers/main_controller.dart';
 import '../../core/imports/core_imports.dart';
@@ -19,19 +15,10 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _appLockContoller.isContinueButtonLoading.value = false;
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          TextButton(
-            onPressed: () async {
-              await EasyLoading.show(status: 'Logging out...');
-              await UserServices.signOut();
-              await EasyLoading.dismiss();
-            },
-            child: const Text('Log out'),
-          ),
-        ],
+      body: Obx(
+        () =>
+            _mainContoller.screens[_mainContoller.selectedNavBarTabIndex.value],
       ),
-      body: const HomeScreen(),
       bottomNavigationBar: Obx(
         () => Padding(
           padding: EdgeInsets.all(16.w),

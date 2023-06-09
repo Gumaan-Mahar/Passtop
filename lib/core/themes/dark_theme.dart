@@ -2,9 +2,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../imports/core_imports.dart';
 
-
 final ThemeData darkTheme = ThemeData.dark().copyWith(
-  useMaterial3: false,
+  useMaterial3: true,
   brightness: Brightness.dark,
   primaryColor: AppColors.primaryColor,
   scaffoldBackgroundColor: AppColors.customDarkColor,
@@ -20,6 +19,9 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     linearTrackColor: Color(
       0xFFD9D9D9,
     ),
+  ),
+  textSelectionTheme: const TextSelectionThemeData(
+    selectionHandleColor: Colors.transparent,
   ),
   textTheme: TextTheme(
     bodySmall: globalTextStyle(
@@ -59,11 +61,10 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
-    filled: false,
     hintStyle: globalTextStyle(
       fontSize: headingSixFontSize,
-      color: AppColors.primaryColorShade50,
-      fontWeight: FontWeight.w400,
+      color: AppColors.primaryColorShade200,
+      fontWeight: FontWeight.w500,
     ),
     errorStyle: globalTextStyle(
       fontSize: headingSixFontSize,
@@ -97,23 +98,6 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
         color: AppColors.shadeDanger,
         width: 1.0,
       ),
-    ),
-  ),
-  bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    elevation: 10,
-    type: BottomNavigationBarType.fixed,
-    backgroundColor: Colors.white,
-    selectedItemColor: AppColors.primaryColor,
-    unselectedItemColor: const Color(0xFF868590),
-    selectedLabelStyle: globalTextStyle(
-      fontSize: 10.sp,
-      color: AppColors.primaryColor,
-      fontWeight: FontWeight.w500,
-    ),
-    unselectedLabelStyle: globalTextStyle(
-      fontSize: 10.sp,
-      color: const Color(0xFF868590),
-      fontWeight: FontWeight.w500,
     ),
   ),
   tabBarTheme: TabBarTheme(

@@ -27,9 +27,9 @@ Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await dotenv.load(fileName: ".env");
   await Supabase.initialize(
-    url: dotenv.env["SUPABASE_URL"]!,
-    anonKey: dotenv.env["SUPABASE_ANON_KEY"]!,
-  );
+      url: dotenv.env["SUPABASE_URL"]!,
+      anonKey: dotenv.env["SUPABASE_ANON_KEY"]!,
+      authCallbackUrlHostname: 'login-callback');
   runApp(const MyApp());
   configLoading();
   FlutterNativeSplash.remove();
@@ -43,7 +43,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -58,6 +57,8 @@ class _MyAppState extends State<MyApp> {
           isCurrentUserLoading.value = false;
         } else if (event.event == AuthChangeEvent.signedOut) {
           currentUser.value = UserModel();
+        } else if (event.event == AuthChangeEvent.tokenRefreshed) {
+          supabase.rest.setAuth(supabase.auth.currentSession?.accessToken);
         }
       },
     );
@@ -65,7 +66,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
@@ -89,12 +89,12 @@ class _MyAppState extends State<MyApp> {
               child: Obx(
                 () => isCurrentUserLoading.value
                     ? Scaffold(
-                      body: Center(
+                        body: Center(
                           child: LoadingAnimationWidget.staggeredDotsWave(
                               color: AppColors.primaryColor, size: 28.w),
                         ),
-                    )
-                    : supabase.auth.currentSession == null 
+                      )
+                    : currentUser.value.id == null
                         ? SigninScreen()
                         : currentUser.value.appLockPassword == null
                             ? SetupAppLockScreen()
