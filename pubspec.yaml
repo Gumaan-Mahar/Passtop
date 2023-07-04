@@ -24,6 +24,7 @@ dependencies:
   flutter_easyloading: ^3.0.5
   flutter_native_splash: ^2.3.0
   custom_navigation_bar: ^0.8.2
+  flutter_typeahead: ^4.6.2
 
   # Backend
   supabase_flutter: ^1.10.0
@@ -34,6 +35,8 @@ dependencies:
   # Utils
   flutter_screenutil: ^5.8.2
   flutter_dotenv: ^5.0.2
+  uuid: ^3.0.7
+  connectivity_plus: ^4.0.1
 
 dev_dependencies:
   flutter_test:

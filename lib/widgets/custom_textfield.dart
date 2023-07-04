@@ -73,11 +73,15 @@ class CustomTextField extends StatelessWidget {
             minWidth: 20.w,
           ),
           prefixIcon: IconTheme(
-            data: context.theme.iconTheme.copyWith(color: Colors.grey),
+            data: context.theme.iconTheme.copyWith(
+              color: AppColors.primaryColor,
+            ),
             child: Icon(prefixIcon),
           ),
           suffixIcon: IconTheme(
-            data: context.theme.iconTheme.copyWith(color: Colors.grey),
+            data: context.theme.iconTheme.copyWith(
+              color: AppColors.primaryColor,
+            ),
             child: Padding(
               padding: const EdgeInsets.only(right: 12),
               child: isPassword

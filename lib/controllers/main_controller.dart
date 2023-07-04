@@ -10,6 +10,12 @@ import 'package:passtop/screens/watch_tower_screen/watch_tower_screen.dart';
 import '../core/instances.dart';
 
 class MainController extends GetxController {
+  @override
+  void onInit() async {
+    subscribeToCurrentUserChannel();
+    super.onInit();
+  }
+
   void subscribeToCurrentUserChannel() {
     supabase.channel('public:users').on(
       RealtimeListenTypes.postgresChanges,
@@ -25,11 +31,11 @@ class MainController extends GetxController {
     ).subscribe();
   }
 
-  final List<Widget> screens = const [
+  final List<Widget> screens = [
     HomeScreen(),
     SearchScreen(),
-    WatchTowerScreen(),
-    SettingsScreen(),
+    const WatchTowerScreen(),
+    const SettingsScreen(),
   ];
 
   final RxInt selectedNavBarTabIndex = 0.obs;

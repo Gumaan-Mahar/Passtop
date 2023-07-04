@@ -4,6 +4,7 @@ import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/resources/assets_manager/assets_manager.dart';
 import 'package:passtop/main.dart';
+import 'package:passtop/methods/password_field_validator.dart';
 import 'package:passtop/screens/main_screen/main_screen.dart';
 import 'package:passtop/services/user_services.dart';
 import 'package:passtop/widgets/button_loader.dart';
@@ -85,32 +86,17 @@ class SetupAppLockScreen extends StatelessWidget {
                         isPassword: true,
                         hasFocus: false.obs,
                         prefixIcon: FlutterRemix.lock_password_line,
-                        validator: (String? value) {
-                          if (_setupAppLockController
-                              .confirmPasswordController.text
-                              .trim()
-                              .isEmpty) {
-                            _setupAppLockController.confirmPasswordFocusNode
-                                .requestFocus();
-                          }
-                          if (value!.isEmpty) {
-                            return AppStrings
-                                .setupApplockScreenPasswordIsRequired;
-                          } else if (value.length < 8) {
-                            return AppStrings
-                                .setupApplockScreenPasswordIsTooShort;
-                          } else if (value.length > 16) {
-                            return AppStrings.setupApplockScreenPasswordIsTooLong;
-                          }
-                          return null;
-                        },
+                        validator: (String? value) => validatePassword(
+                          value: value,
+                          focusNode: _setupAppLockController.passwordFocusNode,
+                        ),
                       ),
                       SizedBox(
                         height: 16.h,
                       ),
                       CustomTextField(
-                        hintText:
-                            AppStrings.setupApplockScreenConfirmPasswordHintText,
+                        hintText: AppStrings
+                            .setupApplockScreenConfirmPasswordHintText,
                         controller:
                             _setupAppLockController.confirmPasswordController,
                         focusNode:
@@ -150,7 +136,8 @@ class SetupAppLockScreen extends StatelessWidget {
                             ? CustomButton(
                                 width: Get.width * 0.8,
                                 marginBottom: 8.h,
-                                text: AppStrings.setupApplockScreenContinueButton,
+                                text:
+                                    AppStrings.setupApplockScreenContinueButton,
                                 onPressed: () async {
                                   if (_setupAppLockController
                                       .formKey.currentState!
@@ -165,8 +152,11 @@ class SetupAppLockScreen extends StatelessWidget {
                                                 .trim(),
                                       },
                                     );
-                                    _setupAppLockController.passwordController.clear();
-                                    _setupAppLockController.confirmPasswordController.clear();
+                                    _setupAppLockController.passwordController
+                                        .clear();
+                                    _setupAppLockController
+                                        .confirmPasswordController
+                                        .clear();
                                     Get.to(() => MainScreen());
                                     _setupAppLockController
                                         .isContinueButtonLoading.value = false;

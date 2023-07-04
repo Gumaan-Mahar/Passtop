@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/constants.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
@@ -12,13 +13,18 @@ import 'package:passtop/widgets/custom_button.dart';
 
 import '../../core/imports/core_imports.dart';
 
-
 class SigninScreen extends StatelessWidget {
   SigninScreen({super.key});
   final SigninController _signinController = Get.find();
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: context.theme.scaffoldBackgroundColor,
+        statusBarColor: context.theme.scaffoldBackgroundColor,
+      ),
+    );
     return Obx(
       () => currentUser.value.id != null
           ? currentUser.value.appLockPassword == null

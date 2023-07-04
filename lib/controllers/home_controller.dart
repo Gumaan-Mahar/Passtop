@@ -1,8 +1,17 @@
+import 'dart:io';
+
 import 'package:passtop/core/imports/core_imports.dart';
+import 'package:passtop/models/password.dart';
+import 'package:passtop/services/passwords_services.dart';
 
 import '../core/imports/packages_imports.dart';
+import '../core/instances.dart';
 
 class HomeController extends GetxController {
+
+  RxList passwords = [].obs;
+  RxList recentPasswords = [].obs;
+
   final List<String> categories = [
     'App',
     'Browser',
@@ -12,7 +21,129 @@ class HomeController extends GetxController {
     'General',
   ];
 
-   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
+  ScrollController passwordsScrollController = ScrollController();
+
+  RxBool isPasswordsFetching = false.obs;
+  RxInt appsPasswordsTotal = 0.obs;
+  RxInt browsersPasswordsTotal = 0.obs;
+  RxInt paymentsPasswordsTotal = 0.obs;
+  RxInt identitiesPasswordsTotal = 0.obs;
+  RxInt addressesPasswordsTotal = 0.obs;
+  RxInt generalPasswordsTotal = 0.obs;
+
+  @override
+  void onInit() async {
+    isPasswordsFetching.value = true;
+    passwords.value = await PasswordsServices.fetchPasswords(
+      userId: supabase.auth.currentUser!.id,
+    );
+    appsPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[0])
+        .length;
+    browsersPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[1])
+        .length;
+    paymentsPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[2])
+        .length;
+    identitiesPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[3])
+        .length;
+    addressesPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[4])
+        .length;
+    generalPasswordsTotal.value = passwords
+        .where((password) => password.category == categories[5])
+        .length;
+    isPasswordsFetching.value = false;
+    PasswordsServices.subscribeToPasswordsChannel(passwords: passwords);
+    refreshRecentPasswords(
+        recentPasswordsList: recentPasswords, passwordsList: passwords);
+    super.onInit();
+  }
+
+  void refreshRecentPasswords(
+      {required RxList recentPasswordsList, required RxList passwordsList}) {
+    recentPasswordsList.value = passwordsList.where(
+      (password) {
+        final createdAt = password.createdAt;
+        final fromDate = DateTime.now().subtract(const Duration(days: 1));
+        return createdAt.isAfter(
+          fromDate,
+        );
+      },
+    ).toList();
+    recentPasswordsList.sort(
+      (first, second) {
+        final firstCreatedAt = first.createdAt;
+        final secondCreatedAt = second.createdAt;
+        return secondCreatedAt.compareTo(firstCreatedAt);
+      },
+    );
+  }
+
+  void updatePasswordListEdit(PasswordModel updatedPassword) {
+    passwords.removeWhere((password) => password.id == updatedPassword.id);
+    passwords.add(updatedPassword);
+    refreshRecentPasswords(
+      recentPasswordsList: recentPasswords,
+      passwordsList: passwords,
+    );
+  }
+
+  void updatePasswordListAfterDelete(String passwordID) {
+    passwords.removeWhere((element) => element.id == passwordID);
+  }
+
+  Future<void> handleAddNewPassword() async {
+    try {
+      await EasyLoading.show(status: 'Saving...');
+      final randomId = uuid.v4();
+      final PasswordModel password = PasswordModel(
+        id: randomId,
+        userId: supabase.auth.currentUser!.id,
+        createdAt: DateTime.now(),
+        category: newPasswordSelectedCategory.value,
+        appName: newPasswordAppNameController.text,
+        username: newPasswordUsernameController.text,
+        password: newPasswordPasswordController.text,
+        websiteUrl: newPasswordWebsiteUrlController.text,
+        cardNumber: newPasswordCardNumberController.text,
+        nameOnCard: newPasswordNameOnCardController.text,
+        expiryMonth: newPasswordExpiryMonth.value,
+        expiryYear: newPasswordExpiryYear.value,
+        nickName: newPasswordNicknameController.text,
+        firstName: newPasswordFirstNameController.text,
+        lastName: newPasswordLastNameController.text,
+        identityNumber: newPasswordIdentityNumberController.text,
+        addressName: newPasswordAddressNameController.text,
+        addressOrganisation: newPasswordAddressOrganisationController.text,
+        addressPhone: newPasswordAddressPhoneController.text,
+        addressEmail: newPasswordAddressEmailController.text,
+        addressRegion: newPasswordAddressRegionController.text,
+        addressStreetAddress: newPasswordAddressStreetAddressController.text,
+        addressCity: newPasswordAddressCityController.text,
+        addressPostalCode: newPasswordAddressPostalCodeController.text,
+        generalText: newPasswordGeneralTextController.text,
+        notes: newPasswordNotesController.text,
+      );
+      await PasswordsServices.savePassword(password: password);
+      clearTextFields();
+      newPasswordSelectedCategory.value = categories[0];
+      await EasyLoading.dismiss();
+    } on SocketException {
+      await EasyLoading.showInfo(
+          'A server or network error occurred. Try again later.');
+    } on HttpException {
+      await EasyLoading.showInfo(
+          'A server or network error occurred. Try again later.');
+    } catch (e) {
+      await EasyLoading.showInfo('Something went wrong. Try again later');
+    }
+  }
 
   final TextEditingController newPasswordAppNameController =
       TextEditingController();
@@ -30,13 +161,13 @@ class HomeController extends GetxController {
       TextEditingController();
   final TextEditingController newPasswordFirstNameController =
       TextEditingController();
-  final TextEditingController newPasswordNLastNameController =
+  final TextEditingController newPasswordLastNameController =
       TextEditingController();
   final TextEditingController newPasswordIdentityNumberController =
       TextEditingController();
   final TextEditingController newPasswordAddressNameController =
       TextEditingController();
-  final TextEditingController newPasswordAddressOrganizationController =
+  final TextEditingController newPasswordAddressOrganisationController =
       TextEditingController();
   final TextEditingController newPasswordAddressPhoneController =
       TextEditingController();
@@ -67,10 +198,10 @@ class HomeController extends GetxController {
   final FocusNode newPasswordNameOnCardFocus = FocusNode();
   final FocusNode newPasswordNicknameFocus = FocusNode();
   final FocusNode newPasswordFirstNameFocus = FocusNode();
-  final FocusNode newPasswordNLastNameFocus = FocusNode();
+  final FocusNode newPasswordLastNameFocus = FocusNode();
   final FocusNode newPasswordIdentityNumberFocus = FocusNode();
   final FocusNode newPasswordAddressNameFocus = FocusNode();
-  final FocusNode newPasswordAddressOrganizationFocus = FocusNode();
+  final FocusNode newPasswordAddressOrganisationFocus = FocusNode();
   final FocusNode newPasswordAddressPhoneFocus = FocusNode();
   final FocusNode newPasswordAddressEmailFocus = FocusNode();
   final FocusNode newPasswordAddressRegionFocus = FocusNode();
@@ -79,8 +210,34 @@ class HomeController extends GetxController {
   final FocusNode newPasswordAddressPostalCodeFocus = FocusNode();
   final FocusNode newPasswordGeneralTextFocus = FocusNode();
 
+  void clearTextFields() {
+    Get.back();
+    newPasswordAppNameController.clear();
+    newPasswordUsernameController.clear();
+    newPasswordPasswordController.clear();
+    newPasswordWebsiteUrlController.clear();
+    newPasswordCardNumberController.clear();
+    newPasswordNameOnCardController.clear();
+    newPasswordNicknameController.clear();
+    newPasswordFirstNameController.clear();
+    newPasswordLastNameController.clear();
+    newPasswordIdentityNumberController.clear();
+    newPasswordAddressNameController.clear();
+    newPasswordAddressOrganisationController.clear();
+    newPasswordAddressPhoneController.clear();
+    newPasswordAddressEmailController.clear();
+    newPasswordAddressRegionController.clear();
+    newPasswordAddressStreetAddressController.clear();
+    newPasswordAddressCityController.clear();
+    newPasswordAddressPostalCodeController.clear();
+    newPasswordGeneralTextController.clear();
+    newPasswordNotesController.clear();
+  }
+
   @override
-  void dispose() {
+  void dispose() async {
+    PasswordsServices.unsubscribeFromPasswordsChannel();
+    passwordsScrollController.dispose();
     newPasswordAppNameController.dispose();
     newPasswordUsernameController.dispose();
     newPasswordPasswordController.dispose();
@@ -89,10 +246,10 @@ class HomeController extends GetxController {
     newPasswordNameOnCardController.dispose();
     newPasswordNicknameController.dispose();
     newPasswordFirstNameController.dispose();
-    newPasswordNLastNameController.dispose();
+    newPasswordLastNameController.dispose();
     newPasswordIdentityNumberController.dispose();
     newPasswordAddressNameController.dispose();
-    newPasswordAddressOrganizationController.dispose();
+    newPasswordAddressOrganisationController.dispose();
     newPasswordAddressPhoneController.dispose();
     newPasswordAddressEmailController.dispose();
     newPasswordAddressRegionController.dispose();
@@ -110,10 +267,10 @@ class HomeController extends GetxController {
     newPasswordNameOnCardFocus.dispose();
     newPasswordNicknameFocus.dispose();
     newPasswordFirstNameFocus.dispose();
-    newPasswordNLastNameFocus.dispose();
+    newPasswordLastNameFocus.dispose();
     newPasswordIdentityNumberFocus.dispose();
     newPasswordAddressNameFocus.dispose();
-    newPasswordAddressOrganizationFocus.dispose();
+    newPasswordAddressOrganisationFocus.dispose();
     newPasswordAddressPhoneFocus.dispose();
     newPasswordAddressEmailFocus.dispose();
     newPasswordAddressRegionFocus.dispose();

@@ -17,10 +17,4 @@ class UserModel {
       appLockPassword = json['app_lock_password'];
       createdAt = DateTime.parse(json['createdat']);
   }
-
-  // Map<String, dynamic> toJson(){
-  //   final Map<String, dynamic> data = new Map<String, dynamic>();
-  //   data['name'] = this.username;
-  //   return data;
-  // }
 }

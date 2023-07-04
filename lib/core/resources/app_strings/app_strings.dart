@@ -1,4 +1,7 @@
 class AppStrings {
+  static const exitAppTitle = "Confirm App Exit"; 
+  static const exitAppDescription = "Are you sure you want to exit the app?";
+
   // Signin Screen
   static const signinScreenTitle =
       "Passwords made easy, security never compromised.";
@@ -19,7 +22,12 @@ class AppStrings {
   static const setupApplockScreenPasswordsDontMatch = "Passwords don't match";
   static const setupApplockScreenContinueButton = "Continue";
 
-  // Home screen
+  // Home Screen
+  static const homeScreenNoRecentPasswords =
+      "Recently added passwords appear here";
+  static const homeScreenRecentlyAdded = "Recently added";
+  static const homeScreenNoPasswords = "No passwords to display!";
+
   static const homeScreenContinueButton = "Continue";
   static const homeScreenPasswordCategoryPayments = "Payments";
   static const homeScreenPasswordCategoryBrowsers = "Browsers";
@@ -53,4 +61,11 @@ class AppStrings {
 
   static const homeScreenThisFieldIsRequired = "This field is required";
   static const homeScreenTooShort = "Too short. Try again";
+
+  static const homeScreenAreYouSure = "Are you sure?";
+  static const homeScreenConfirmDeletePassword =
+      "Do you really want to delete this password? This process cannot be undone.";
+
+  // Search Screen
+  static const searchScreenSearchHere = "Search here...";
 }
