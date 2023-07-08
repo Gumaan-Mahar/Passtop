@@ -1,11 +1,11 @@
-
-import '../controllers/home_controller.dart';
 import '../core/imports/core_imports.dart';
 import '../core/imports/packages_imports.dart';
 
-void showCustomBottomSheet({required Widget content, double? height}) {
-  HomeController homeController = Get.find();
-  homeController.scaffoldKey.currentState!.showBottomSheet(
+void showCustomBottomSheet(
+    {required Widget content,
+    double? height,
+    required GlobalKey<ScaffoldState> scaffoldKey}) {
+  scaffoldKey.currentState!.showBottomSheet(
     (context) => Stack(
       alignment: AlignmentDirectional.bottomEnd,
       children: [

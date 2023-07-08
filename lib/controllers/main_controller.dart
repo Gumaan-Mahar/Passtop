@@ -34,7 +34,7 @@ class MainController extends GetxController {
   final List<Widget> screens = [
     HomeScreen(),
     SearchScreen(),
-    const WatchTowerScreen(),
+    WatchTowerScreen(),
     const SettingsScreen(),
   ];
 

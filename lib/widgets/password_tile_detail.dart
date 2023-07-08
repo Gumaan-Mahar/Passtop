@@ -16,12 +16,14 @@ class PasswordTileDetail extends StatelessWidget {
   final PasswordCategory category;
   final bool? showMore;
   final bool? showCategoryChip;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
   const PasswordTileDetail({
     Key? key,
     required this.password,
     required this.category,
     this.showMore,
     this.showCategoryChip,
+    this.scaffoldKey,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,7 @@ class PasswordTileDetail extends StatelessWidget {
                   isPassword: false,
                   showMore: showMore ?? true,
                   showCategoryChip: showCategoryChip ?? false,
+                  scaffoldKey: scaffoldKey,
                 )
               : category.isBrowser
                   ? FieldTile(
@@ -54,6 +57,7 @@ class PasswordTileDetail extends StatelessWidget {
                       isPassword: false,
                       showMore: showMore ?? true,
                       showCategoryChip: showCategoryChip ?? false,
+                      scaffoldKey: scaffoldKey,
                     )
                   : category.isPayment
                       ? FieldTile(
@@ -305,7 +309,7 @@ class PasswordTileDetail extends StatelessWidget {
 }
 
 class FieldTile extends StatelessWidget {
-  const FieldTile({
+  FieldTile({
     super.key,
     required this.password,
     required this.category,
@@ -314,6 +318,7 @@ class FieldTile extends StatelessWidget {
     required this.isPassword,
     this.showMore = false,
     this.showCategoryChip = false,
+    this.scaffoldKey,
   });
 
   final PasswordModel password;
@@ -323,6 +328,9 @@ class FieldTile extends StatelessWidget {
   final bool isPassword;
   final bool showMore;
   final bool showCategoryChip;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+
+  final HomeController homeController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -376,6 +384,8 @@ class FieldTile extends StatelessWidget {
                                         password: password,
                                         category: category,
                                       ),
+                                      scaffoldKey: scaffoldKey ??
+                                          homeController.scaffoldKey,
                                     );
                                   },
                                 ),
@@ -485,6 +495,8 @@ class FieldTile extends StatelessWidget {
                                           )
                                         ],
                                       ),
+                                      scaffoldKey: scaffoldKey ??
+                                          homeController.scaffoldKey,
                                     );
                                   },
                                 ),

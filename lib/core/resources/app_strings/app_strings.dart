@@ -1,5 +1,5 @@
 class AppStrings {
-  static const exitAppTitle = "Confirm App Exit"; 
+  static const exitAppTitle = "Confirm App Exit";
   static const exitAppDescription = "Are you sure you want to exit the app?";
 
   // Signin Screen
@@ -68,4 +68,13 @@ class AppStrings {
 
   // Search Screen
   static const searchScreenSearchHere = "Search here...";
+
+  // Passwords Watch Tower Screen
+  static const watchTowerScreenTitle = "Passwords Health";
+  static const watchTowerScreenCommonPasswordsTitle = "Common Passwords";
+  static const watchTowerScreenCommonPasswordsDescription =
+      'Common passwords are passwords that are widely used or known to a large number of people. These passwords are often easily guessable or can be cracked through dictionary-based attacks. Common passwords are typically weak and should be avoided as they offer little protection against unauthorized access. Examples of common passwords include "password," "123456," or "qwerty." Using common passwords puts user accounts at a higher risk of being compromised.';
+  static const watchTowerScreenReusedPasswordsTitle = "Reused Passwords";
+  static const watchTowerScreenReusedPasswordsDescription =
+      'Reused passwords are passwords that are used across multiple accounts or platforms. When a person uses the same password for different accounts, it becomes a reused password. This practice is discouraged as it poses a security risk. If one account with a reused password is compromised, all other accounts with the same password become vulnerable. Attackers often target one account to gain access to multiple accounts using the same password. It is recommended to use unique passwords for each account or platform to maintain better security.';
 }

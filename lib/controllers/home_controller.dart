@@ -8,7 +8,6 @@ import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
 
 class HomeController extends GetxController {
-
   RxList passwords = [].obs;
   RxList recentPasswords = [].obs;
 
@@ -61,7 +60,9 @@ class HomeController extends GetxController {
     isPasswordsFetching.value = false;
     PasswordsServices.subscribeToPasswordsChannel(passwords: passwords);
     refreshRecentPasswords(
-        recentPasswordsList: recentPasswords, passwordsList: passwords);
+      recentPasswordsList: recentPasswords,
+      passwordsList: passwords,
+    );
     super.onInit();
   }
 
