@@ -1,9 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
+import 'package:passtop/controllers/main_controller.dart';
 import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/core/instances.dart';
 import 'package:passtop/core/themes/themes.dart';
 import 'package:passtop/screens/app_lock_screen/app_lock_screen.dart';
+import 'package:passtop/screens/connectivity_checker/connectivity_checker_screen.dart';
 import 'package:passtop/screens/set_up_applock_screen/set_up_applock_screen.dart';
 import 'package:passtop/services/user_services.dart';
 
@@ -11,39 +14,21 @@ import 'controllers/applock_controller.dart';
 import 'controllers/signin_controller.dart';
 import 'core/imports/packages_imports.dart';
 import 'models/user.dart';
-import 'screens/no_internet_connection_screen/no_internet_connection.dart';
+
 import 'screens/signin_screen/signin_screen.dart';
-
-void configLoading() {
-  EasyLoading.instance
-    ..userInteractions = false
-    ..dismissOnTap = false;
-}
-
-Future<bool> checkConnectivity() async {
-  var connectivityResult = await (Connectivity().checkConnectivity());
-  if (connectivityResult == ConnectivityResult.none) {
-    return false;
-  } else {
-    return true;
-  }
-}
 
 final Rx<UserModel> currentUser = UserModel().obs;
 final RxBool isCurrentUserLoading = false.obs;
-final RxBool isConnected = false.obs;
 
-Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+main() {
+  final WidgetsBinding widgetsBinding =
+      WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await dotenv.load(fileName: ".env");
-  await Supabase.initialize(
-      url: dotenv.env["SUPABASE_URL"]!,
-      anonKey: dotenv.env["SUPABASE_ANON_KEY"]!,
-      authCallbackUrlHostname: 'login-callback');
-  runApp(const MyApp());
-  configLoading();
-  FlutterNativeSplash.remove();
+  runApp(
+    const ConnectivityChecker(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -60,37 +45,29 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    checkConnectivity().then(
-      (value) {
-        isConnected.value = value;
-        if (isConnected.value) {
-          supabase.auth.onAuthStateChange.listen(
-            (event) async {
-              if (event.event == AuthChangeEvent.signedIn) {
-                isCurrentUserLoading.value = true;
-                await UserServices.getCurrentUser(
-                    userId: supabase.auth.currentUser!.id);
-                isCurrentUserLoading.value = false;
-              } else if (event.event == AuthChangeEvent.signedOut) {
-                currentUser.value = UserModel();
-              } else if (event.event == AuthChangeEvent.tokenRefreshed) {
-                final newPersistSessionString =
-                    event.session!.persistSessionString;
-                final newSession =
-                    await supabase.auth.recoverSession(newPersistSessionString);
-                await UserServices.getCurrentUser(
-                    userId: newSession.session!.user.id);
-              } else if (DateTime.fromMillisecondsSinceEpoch(
-                      event.session!.expiresAt!)
-                  .isBefore(
-                DateTime.now().subtract(
-                  const Duration(seconds: 2),
-                ),
-              )) {
-                await supabase.auth.refreshSession();
-              }
-            },
-          );
+    supabase.auth.onAuthStateChange.listen(
+      (event) async {
+        if (event.event == AuthChangeEvent.signedIn) {
+          isCurrentUserLoading.value = true;
+          await UserServices.getCurrentUser(
+              userId: supabase.auth.currentUser!.id);
+          isCurrentUserLoading.value = false;
+        } else if (event.event == AuthChangeEvent.signedOut) {
+          currentUser.value = UserModel();
+        } else if (event.event == AuthChangeEvent.tokenRefreshed) {
+          final newPersistSessionString = event.session!.persistSessionString;
+          final newSession =
+              await supabase.auth.recoverSession(newPersistSessionString);
+          await UserServices.getCurrentUser(
+              userId: newSession.session!.user.id);
+        } else if (DateTime.fromMillisecondsSinceEpoch(
+                event.session!.expiresAt!)
+            .isBefore(
+          DateTime.now().subtract(
+            const Duration(seconds: 2),
+          ),
+        )) {
+          await supabase.auth.refreshSession();
         }
       },
     );
@@ -117,23 +94,19 @@ class _MyAppState extends State<MyApp> {
             theme: Themes.dark,
             debugShowCheckedModeBanner: false,
             useInheritedMediaQuery: true,
-            home: Obx(
-              () => isConnected.value
-                  ? SafeArea(
-                      child: isCurrentUserLoading.value
-                          ? Scaffold(
-                              body: Center(
-                                child: LoadingAnimationWidget.staggeredDotsWave(
-                                    color: AppColors.primaryColor, size: 28.w),
-                              ),
-                            )
-                          : currentUser.value.id == null
-                              ? SigninScreen()
-                              : currentUser.value.appLockPassword == null
-                                  ? SetupAppLockScreen()
-                                  : AppLockScreen(),
+            home: SafeArea(
+              child: isCurrentUserLoading.value
+                  ? Scaffold(
+                      body: Center(
+                        child: LoadingAnimationWidget.staggeredDotsWave(
+                            color: AppColors.primaryColor, size: 28.w),
+                      ),
                     )
-                  : const NoInternetConnectionScreen(),
+                  : currentUser.value.id == null
+                      ? SigninScreen()
+                      : currentUser.value.appLockPassword == null
+                          ? SetupAppLockScreen()
+                          : AppLockScreen(),
             ),
             builder: EasyLoading.init(),
           );

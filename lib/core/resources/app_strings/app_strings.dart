@@ -1,6 +1,8 @@
 class AppStrings {
   static const exitAppTitle = "Confirm App Exit";
   static const exitAppDescription = "Are you sure you want to exit the app?";
+  static const initializationErrorMsg =
+      "Oops! We encountered an issue while setting up the app. Please try again later.";
 
   // Signin Screen
   static const signinScreenTitle =
