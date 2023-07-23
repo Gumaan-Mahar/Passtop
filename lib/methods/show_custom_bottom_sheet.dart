@@ -16,7 +16,7 @@ void showCustomBottomSheet(
           child: Container(
             width: Get.width,
             height: Get.height,
-            color: Colors.transparent,
+            color: Colors.black.withOpacity(0.6),
           ),
         ),
         Container(

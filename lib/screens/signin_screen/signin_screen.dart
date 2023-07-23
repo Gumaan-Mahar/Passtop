@@ -1,10 +1,9 @@
 import 'package:flutter/services.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/signin_controller.dart';
-import 'package:passtop/core/constants.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/instances.dart';
 import 'package:passtop/core/resources/assets_manager/assets_manager.dart';
-import 'package:passtop/main.dart';
 import 'package:passtop/screens/app_lock_screen/app_lock_screen.dart';
 import 'package:passtop/screens/set_up_applock_screen/set_up_applock_screen.dart';
 import 'package:passtop/services/auth_services.dart';
@@ -15,7 +14,8 @@ import '../../core/imports/core_imports.dart';
 
 class SigninScreen extends StatelessWidget {
   SigninScreen({super.key});
-  final SigninController _signinController = Get.find();
+  final SigninController signinController = Get.find();
+  final InitializationController initializationController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +26,15 @@ class SigninScreen extends StatelessWidget {
       ),
     );
     return Obx(
-      () => currentUser.value.id != null
-          ? currentUser.value.appLockPassword == null
+      () => initializationController.currentUser.value != null
+          ? initializationController.currentUser.value!.appLockPassword == null
               ? SetupAppLockScreen()
               : AppLockScreen()
           : Scaffold(
               body: Padding(
-                padding: kHorizontalPadding,
+                padding: EdgeInsets.symmetric(
+                  horizontal: Get.width * 0.03,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -77,9 +79,10 @@ class SigninScreen extends StatelessWidget {
                             ),
                             const Spacer(),
                             Obx(
-                              () => (_signinController
+                              () => (signinController
                                           .isContinueButtonLoading.value ||
-                                      isCurrentUserLoading.value)
+                                      initializationController
+                                          .isCurrentUserLoading.value)
                                   ? ButtonLoader(width: Get.width * 0.8)
                                   : SlideInUp(
                                       child: CustomButton(
@@ -93,13 +96,13 @@ class SigninScreen extends StatelessWidget {
                                           FlutterRemix.google_fill,
                                         ),
                                         onPressed: () async {
-                                          _signinController
+                                          signinController
                                               .isContinueButtonLoading
                                               .value = true;
                                           await AuthServices.continueWithGoogle(
                                               context: context);
                                           supabase.auth.currentUser == null
-                                              ? _signinController
+                                              ? signinController
                                                   .isContinueButtonLoading
                                                   .value = false
                                               : null;

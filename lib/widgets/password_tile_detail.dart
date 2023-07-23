@@ -456,6 +456,11 @@ class FieldTile extends StatelessWidget {
                                                       .deletePassword(
                                                     passwordID: password.id,
                                                   );
+                                                  await Future.delayed(
+                                                    const Duration(
+                                                      seconds: 1,
+                                                    ),
+                                                  );
                                                   final category =
                                                       PasswordCategory(
                                                     category: password.category,

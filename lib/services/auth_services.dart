@@ -2,13 +2,43 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:passtop/core/imports/core_imports.dart';
-import 'package:passtop/widgets/show_toast.dart';
 
 import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
 
+// class AuthServices {
+//   static Future<void> continueWithGoogle(
+//       {required BuildContext context}) async {
+//     try {
+//       await supabase.auth.signInWithOAuth(
+//         Provider.google,
+//         redirectTo: kIsWeb
+//             ? null
+//             : 'https://dabpyizqziezyyqxjkqn.supabase.co/auth/v1/callback',
+//         authScreenLaunchMode: LaunchMode.platformDefault,
+//         context: context,
+//       );
+//     } catch (e) {
+//       await EasyLoading.showInfo('Unexpected error occured while signing you in.');
+//       log(e.toString());
+//     }
+//   }
+// }
+
 class AuthServices {
-  static Future<void> continueWithGoogle({required BuildContext context}) async {
+  static bool isAuthenticating = false;
+
+  static Future<void> continueWithGoogle(
+      {required BuildContext context}) async {
+    // Check if an authentication attempt is already ongoing
+    if (isAuthenticating) {
+      await EasyLoading.showInfo('Already signing you in. Please wait...');
+      return;
+    }
+
+    // Set the flag to indicate an authentication attempt is in progress
+    isAuthenticating = true;
+
     try {
       await supabase.auth.signInWithOAuth(
         Provider.google,
@@ -18,9 +48,14 @@ class AuthServices {
         authScreenLaunchMode: LaunchMode.platformDefault,
         context: context,
       );
-    } catch (e) {
-      showToast('Login failed');
-      log(e.toString());
+    } catch (error) {
+      await EasyLoading.showInfo(
+        'Unexpected error occurred while signing you in.',
+      );
+      log(error.toString());
+    } finally {
+      // Reset the flag to allow future authentication attempts
+      isAuthenticating = false;
     }
   }
 }

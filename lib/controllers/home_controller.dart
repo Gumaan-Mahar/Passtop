@@ -1,8 +1,10 @@
-import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/models/password.dart';
 import 'package:passtop/services/passwords_services.dart';
+import 'package:passtop/services/preferences_services.dart';
 
 import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
@@ -33,36 +35,53 @@ class HomeController extends GetxController {
   RxInt addressesPasswordsTotal = 0.obs;
   RxInt generalPasswordsTotal = 0.obs;
 
+  final InitializationController initializationController = Get.find();
+
   @override
   void onInit() async {
     isPasswordsFetching.value = true;
-    passwords.value = await PasswordsServices.fetchPasswords(
-      userId: supabase.auth.currentUser!.id,
-    );
-    appsPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[0])
-        .length;
-    browsersPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[1])
-        .length;
-    paymentsPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[2])
-        .length;
-    identitiesPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[3])
-        .length;
-    addressesPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[4])
-        .length;
-    generalPasswordsTotal.value = passwords
-        .where((password) => password.category == categories[5])
-        .length;
-    isPasswordsFetching.value = false;
-    PasswordsServices.subscribeToPasswordsChannel(passwords: passwords);
-    refreshRecentPasswords(
-      recentPasswordsList: recentPasswords,
-      passwordsList: passwords,
-    );
+    final currentUser = supabase.auth.currentUser;
+    if (currentUser != null) {
+      final bool? isPasswordsCached =
+          Preferences().instance?.containsKey('password_list');
+      if (initializationController.connectionStatus.value ==
+              ConnectivityResult.none &&
+          isPasswordsCached!) {
+        passwords.value = await PreferencesServices().fetchPasswordModelList();
+      } else {
+        passwords.value = await PasswordsServices.fetchPasswords(
+          userId: currentUser.id,
+        );
+      }
+      await PreferencesServices().updatePasswordModelList(passwords);
+      appsPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[0])
+          .length;
+      browsersPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[1])
+          .length;
+      paymentsPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[2])
+          .length;
+      identitiesPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[3])
+          .length;
+      addressesPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[4])
+          .length;
+      generalPasswordsTotal.value = passwords
+          .where((password) => password.category == categories[5])
+          .length;
+      isPasswordsFetching.value = false;
+      PasswordsServices.subscribeToPasswordsChannel(
+        passwords: passwords,
+        homeController: this,
+      );
+      refreshRecentPasswords(
+        recentPasswordsList: recentPasswords,
+        passwordsList: passwords,
+      );
+    }
     super.onInit();
   }
 
@@ -100,50 +119,45 @@ class HomeController extends GetxController {
   }
 
   Future<void> handleAddNewPassword() async {
-    try {
-      await EasyLoading.show(status: 'Saving...');
-      final randomId = uuid.v4();
-      final PasswordModel password = PasswordModel(
-        id: randomId,
-        userId: supabase.auth.currentUser!.id,
-        createdAt: DateTime.now(),
-        category: newPasswordSelectedCategory.value,
-        appName: newPasswordAppNameController.text,
-        username: newPasswordUsernameController.text,
-        password: newPasswordPasswordController.text,
-        websiteUrl: newPasswordWebsiteUrlController.text,
-        cardNumber: newPasswordCardNumberController.text,
-        nameOnCard: newPasswordNameOnCardController.text,
-        expiryMonth: newPasswordExpiryMonth.value,
-        expiryYear: newPasswordExpiryYear.value,
-        nickName: newPasswordNicknameController.text,
-        firstName: newPasswordFirstNameController.text,
-        lastName: newPasswordLastNameController.text,
-        identityNumber: newPasswordIdentityNumberController.text,
-        addressName: newPasswordAddressNameController.text,
-        addressOrganisation: newPasswordAddressOrganisationController.text,
-        addressPhone: newPasswordAddressPhoneController.text,
-        addressEmail: newPasswordAddressEmailController.text,
-        addressRegion: newPasswordAddressRegionController.text,
-        addressStreetAddress: newPasswordAddressStreetAddressController.text,
-        addressCity: newPasswordAddressCityController.text,
-        addressPostalCode: newPasswordAddressPostalCodeController.text,
-        generalText: newPasswordGeneralTextController.text,
-        notes: newPasswordNotesController.text,
-      );
-      await PasswordsServices.savePassword(password: password);
-      clearTextFields();
-      newPasswordSelectedCategory.value = categories[0];
-      await EasyLoading.dismiss();
-    } on SocketException {
-      await EasyLoading.showInfo(
-          'A server or network error occurred. Try again later.');
-    } on HttpException {
-      await EasyLoading.showInfo(
-          'A server or network error occurred. Try again later.');
-    } catch (e) {
-      await EasyLoading.showInfo('Something went wrong. Try again later');
-    }
+    await EasyLoading.show(status: 'Saving...');
+    final randomId = uuid.v4();
+    final PasswordModel password = PasswordModel(
+      id: randomId,
+      userId: supabase.auth.currentUser!.id,
+      createdAt: DateTime.now(),
+      category: newPasswordSelectedCategory.value,
+      appName: newPasswordAppNameController.text,
+      username: newPasswordUsernameController.text,
+      password: newPasswordPasswordController.text,
+      websiteUrl: newPasswordWebsiteUrlController.text,
+      cardNumber: newPasswordCardNumberController.text,
+      nameOnCard: newPasswordNameOnCardController.text,
+      expiryMonth: newPasswordExpiryMonth.value,
+      expiryYear: newPasswordExpiryYear.value,
+      nickName: newPasswordNicknameController.text,
+      firstName: newPasswordFirstNameController.text,
+      lastName: newPasswordLastNameController.text,
+      identityNumber: newPasswordIdentityNumberController.text,
+      addressName: newPasswordAddressNameController.text,
+      addressOrganisation: newPasswordAddressOrganisationController.text,
+      addressPhone: newPasswordAddressPhoneController.text,
+      addressEmail: newPasswordAddressEmailController.text,
+      addressRegion: newPasswordAddressRegionController.text,
+      addressStreetAddress: newPasswordAddressStreetAddressController.text,
+      addressCity: newPasswordAddressCityController.text,
+      addressPostalCode: newPasswordAddressPostalCodeController.text,
+      generalText: newPasswordGeneralTextController.text,
+      notes: newPasswordNotesController.text,
+    );
+    await PasswordsServices.savePassword(password: password);
+    newPasswordSelectedCategory.value = categories[0];
+    await Future.delayed(
+      const Duration(
+        seconds: 1,
+      ),
+    );
+    clearTextFields();
+    await EasyLoading.dismiss();
   }
 
   final TextEditingController newPasswordAppNameController =

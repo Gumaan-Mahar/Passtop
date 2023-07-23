@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:passtop/widgets/custom_button.dart';
 
 import '../core/imports/core_imports.dart';
 import '../core/imports/packages_imports.dart';
@@ -23,25 +24,18 @@ Future<bool> handleWillPopScope({
               style: context.theme.textTheme.labelMedium,
             ),
             actions: <Widget>[
-              TextButton(
-                child: Text(
-                  'Cancel',
-                  style: context.theme.textTheme.labelMedium!.copyWith(
-                    color: AppColors.primaryColorShade200,
-                  ),
-                ),
+              CustomButton(
+                width: Get.width * 0.3,
+                text: 'Cancel',
                 onPressed: () => Get.back(),
               ),
-              TextButton(
-                child: Text(
-                  'Exit',
-                  style: context.theme.textTheme.labelMedium!.copyWith(
-                    color: AppColors.primaryColorShade200,
-                  ),
-                ),
+              CustomButton(
+                width: Get.width * 0.3,
+                color: AppColors.shadeDanger,
+                text: 'Exit',
                 onPressed: () =>
                     SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
-              )
+              ),
             ],
           );
         },

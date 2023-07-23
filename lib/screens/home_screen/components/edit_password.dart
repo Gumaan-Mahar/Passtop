@@ -362,6 +362,11 @@ class EditPassword extends StatelessWidget {
                     );
                     await PasswordsServices.updatePassword(
                         password: passwordModel);
+                    await Future.delayed(
+                      const Duration(
+                        seconds: 1,
+                      ),
+                    );
                     await EasyLoading.dismiss();
                     Get.back();
                   }

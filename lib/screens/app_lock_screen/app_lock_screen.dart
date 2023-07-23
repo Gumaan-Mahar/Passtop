@@ -1,13 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:passtop/controllers/applock_controller.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/resources/assets_manager/assets_manager.dart';
-import 'package:passtop/main.dart';
 import 'package:passtop/screens/main_screen/main_screen.dart';
 import 'package:passtop/widgets/button_loader.dart';
 import 'package:passtop/widgets/custom_button.dart';
 import 'package:passtop/widgets/custom_circle_avatar.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants.dart';
 import '../../core/imports/core_imports.dart';
@@ -18,6 +19,7 @@ class AppLockScreen extends StatelessWidget {
 
   final AppLockController _appLockController = Get.find();
   final SigninController _signinController = Get.find();
+  final InitializationController _initializationController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +52,25 @@ class AppLockScreen extends StatelessWidget {
                       SizedBox(
                         height: Get.height * 0.16,
                       ),
-                      CustomCircleAvatar(
-                        width: Get.width * 0.3,
-                        height: Get.height * 0.15,
-                        profileUrl: currentUser.value.imageUrl!,
-                      ),
+                      _initializationController.currentUser.value != null
+                          ? CustomCircleAvatar(
+                              width: Get.width * 0.3,
+                              height: Get.height * 0.15,
+                              profileUrl: _initializationController
+                                  .currentUser.value!.imageUrl!,
+                            )
+                          : Shimmer.fromColors(
+                              baseColor: AppColors.shadeDark,
+                              highlightColor: AppColors.customDarkColor,
+                              child: Container(
+                                width: Get.width * 0.3,
+                                height: Get.height * 0.15,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primaryColorShade50,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
                       SizedBox(
                         height: 32.h,
                       ),
@@ -72,7 +88,8 @@ class AppLockScreen extends StatelessWidget {
                             return 'Enter password before you continue';
                           } else if (_appLockController
                                   .passwordController.text !=
-                              currentUser.value.appLockPassword) {
+                              _initializationController
+                                  .currentUser.value?.appLockPassword) {
                             return 'Password is invalid. Try again!';
                           }
                           return null;

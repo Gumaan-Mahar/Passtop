@@ -1,6 +1,7 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:passtop/controllers/applock_controller.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/search_controller.dart';
 
 import '../../controllers/main_controller.dart';
@@ -15,6 +16,7 @@ class MainScreen extends StatelessWidget {
   final MainController _mainContoller = Get.put(MainController());
   final PasswordSearchController _passwordSearchController =
       Get.put(PasswordSearchController());
+  final InitializationController initializationController = Get.find();
 
   @override
   Widget build(BuildContext context) {

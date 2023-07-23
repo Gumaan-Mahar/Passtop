@@ -196,40 +196,46 @@ class WatchTowerScreen extends StatelessWidget {
               ),
               SliverToBoxAdapter(
                 child: ListTile(
-                  isThreeLine: true,
-                  leading: const Icon(
-                    FlutterRemix.information_line,
-                    color: AppColors.primaryColorShade200,
+                  titleAlignment: ListTileTitleAlignment.top,
+                  leading: Container(
+                    width: 40.w,
+                    height: 40.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.secondaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      FlutterRemix.information_line,
+                      color: Colors.white,
+                    ),
                   ),
                   title: Text(
-                    AppStrings.watchTowerScreenCommonPasswordsTitle,
-                    style: context.theme.textTheme.labelMedium,
-                  ),
-                  subtitle: Text(
                     AppStrings.watchTowerScreenCommonPasswordsDescription,
-                    style: context.theme.textTheme.labelSmall!
-                        .copyWith(color: AppColors.primaryColorShade300),
+                    style: context.theme.textTheme.labelMedium!.copyWith(
+                      color: AppColors.primaryColorShade300,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: ListTile(
-                  isThreeLine: true,
-                  leading: const Icon(
-                    FlutterRemix.information_line,
-                    color: AppColors.primaryColorShade200,
-                  ),
-                  title: Text(
-                    AppStrings.watchTowerScreenReusedPasswordsTitle,
-                    style: context.theme.textTheme.labelMedium,
-                  ),
-                  subtitle: Text(
-                    AppStrings.watchTowerScreenReusedPasswordsDescription,
-                    style: context.theme.textTheme.labelSmall!
-                        .copyWith(color: AppColors.primaryColorShade300),
-                  ),
-                ),
-              ),
+              // SliverToBoxAdapter(
+              //   child: ListTile(
+              //     isThreeLine: true,
+              //     leading: const Icon(
+              //       FlutterRemix.information_line,
+              //       color: AppColors.primaryColorShade200,
+              //     ),
+              //     title: Text(
+              //       AppStrings.watchTowerScreenReusedPasswordsTitle,
+              //       style: context.theme.textTheme.labelMedium,
+              //     ),
+              //     subtitle: Text(
+              //       AppStrings.watchTowerScreenReusedPasswordsDescription,
+              //       style: context.theme.textTheme.labelSmall!
+              //           .copyWith(color: AppColors.primaryColorShade300),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

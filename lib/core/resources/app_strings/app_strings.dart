@@ -3,6 +3,9 @@ class AppStrings {
   static const exitAppDescription = "Are you sure you want to exit the app?";
   static const initializationErrorMsg =
       "Oops! We encountered an issue while setting up the app. Please try again later.";
+  static const sessionExpiredLoggingOut = "Session expired. Logging out...";
+  static const sessionExpiredSigninAgain =
+      "Your session was expired. Please, log in again.";
 
   // Signin Screen
   static const signinScreenTitle =
@@ -23,6 +26,8 @@ class AppStrings {
       "Confirm password before you continue";
   static const setupApplockScreenPasswordsDontMatch = "Passwords don't match";
   static const setupApplockScreenContinueButton = "Continue";
+  static const setupApplockScreenErrorUpdatingMasterPassword =
+      "Sorry, we couldn't update your app lock password. Please check your internet connection and try again later.";
 
   // Home Screen
   static const homeScreenNoRecentPasswords =
@@ -75,8 +80,28 @@ class AppStrings {
   static const watchTowerScreenTitle = "Passwords Health";
   static const watchTowerScreenCommonPasswordsTitle = "Common Passwords";
   static const watchTowerScreenCommonPasswordsDescription =
-      'Common passwords are passwords that are widely used or known to a large number of people. These passwords are often easily guessable or can be cracked through dictionary-based attacks. Common passwords are typically weak and should be avoided as they offer little protection against unauthorized access. Examples of common passwords include "password," "123456," or "qwerty." Using common passwords puts user accounts at a higher risk of being compromised.';
+      "Create strong passwords by combining characters, numbers, symbols and a mix of uppercase and lowercase letters. Avoid using personal info like birthdays or names. Update passwords regularly and never reuse them. Stay secure online and protect your data.";
   static const watchTowerScreenReusedPasswordsTitle = "Reused Passwords";
-  static const watchTowerScreenReusedPasswordsDescription =
-      'Reused passwords are passwords that are used across multiple accounts or platforms. When a person uses the same password for different accounts, it becomes a reused password. This practice is discouraged as it poses a security risk. If one account with a reused password is compromised, all other accounts with the same password become vulnerable. Attackers often target one account to gain access to multiple accounts using the same password. It is recommended to use unique passwords for each account or platform to maintain better security.';
+
+  // Settings Screen
+  static const settingsScreenTitle = "Settings";
+  static const settingsScreenInvalidCurrentPassword =
+      "Invalid current password";
+  static const settingsScreenPasswordSuccessfullyChanged =
+      "Master password key was changed succesfully!";
+  static const settingsScreenChangeMasterPasswordTitle =
+      "Change master password key";
+  static const settingsScreenCurrentPasswordHint = "Enter current password";
+  static const settingsScreenNewPasswordHint = "Enter new password";
+  static const settingsScreenConfirmNewPasswordHint = "Confirm new password";
+  static const settingsScreenEnterMasterPasswordHint =
+      "Enter master password key";
+  static const settingsScreenDeleteAccountTitle = "Confirm Account Deletion";
+  static const settingsScreenDeleteAccountHeadline =
+      "We are sorry to see you go.";
+  static const settingsScreenDeleteAccountDescription =
+      "This action will permanently delete your account and all the data associated with it.";
+  static const settingsScreenDeletingAccount = "Deleting Account...";
+  static const settingsScreenAccountDeleted =
+      "Your account was successfully deleted.";
 }

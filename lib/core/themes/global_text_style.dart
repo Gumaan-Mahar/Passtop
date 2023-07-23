@@ -6,7 +6,7 @@ TextStyle globalTextStyle({
   required double fontSize,
   double letterSpacing = 0.5,
   double lineHeight = 0,
-  FontWeight fontWeight = FontWeight.normal,
+  FontWeight fontWeight = FontWeight.w500,
 }) =>
     TextStyle(
       color: color,

@@ -5,7 +5,7 @@ import '../../../core/imports/core_imports.dart';
 import '../../../core/imports/packages_imports.dart';
 
 Future<dynamic> displayBottomSheet(BuildContext context) {
-  final HomeController homeController = Get.put(HomeController());
+  final HomeController homeController = Get.find();
 
   return showModalBottomSheet(
     isScrollControlled: true,
@@ -38,7 +38,8 @@ Future<dynamic> displayBottomSheet(BuildContext context) {
             key: homeController.formKey,
             child: Padding(
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Container(
                 width: Get.width,
                 height: Get.height * 0.8,

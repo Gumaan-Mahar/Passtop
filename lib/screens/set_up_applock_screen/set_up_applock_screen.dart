@@ -1,10 +1,9 @@
 import 'package:flutter/services.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/setup_applock_controller.dart';
 import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/resources/assets_manager/assets_manager.dart';
-import 'package:passtop/main.dart';
-import 'package:passtop/methods/password_field_validator.dart';
 import 'package:passtop/screens/main_screen/main_screen.dart';
 import 'package:passtop/services/user_services.dart';
 import 'package:passtop/widgets/button_loader.dart';
@@ -14,6 +13,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants.dart';
 import '../../core/imports/core_imports.dart';
+import '../../methods/validate_master_password.dart';
 import '../../widgets/custom_textfield.dart';
 
 class SetupAppLockScreen extends StatelessWidget {
@@ -23,6 +23,8 @@ class SetupAppLockScreen extends StatelessWidget {
       Get.put(SetupAppLockController());
 
   final SigninController _signinController = Get.find();
+
+  final InitializationController _initializationController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +58,12 @@ class SetupAppLockScreen extends StatelessWidget {
                         height: Get.height * 0.16,
                       ),
                       Obx(
-                        () => currentUser.value.imageUrl != null
+                        () => _initializationController
+                                    .currentUser.value?.imageUrl !=
+                                null
                             ? CustomCircleAvatar(
-                                profileUrl: currentUser.value.imageUrl!,
+                                profileUrl: _initializationController
+                                    .currentUser.value!.imageUrl!,
                                 width: Get.width * 0.3,
                                 height: Get.height * 0.15,
                               )
@@ -69,8 +74,9 @@ class SetupAppLockScreen extends StatelessWidget {
                                   width: Get.width * 0.3,
                                   height: Get.height * 0.15,
                                   decoration: const BoxDecoration(
-                                      color: AppColors.primaryColorShade50,
-                                      shape: BoxShape.circle),
+                                    color: AppColors.primaryColorShade50,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                               ),
                       ),
@@ -78,19 +84,22 @@ class SetupAppLockScreen extends StatelessWidget {
                         height: 32.h,
                       ),
                       CustomTextField(
-                        hintText: AppStrings.setupApplockScreenPasswordHintText,
-                        controller: _setupAppLockController.passwordController,
-                        focusNode: _setupAppLockController.passwordFocusNode,
-                        keyboardType: TextInputType.name,
-                        isPasswordVisible: false.obs,
-                        isPassword: true,
-                        hasFocus: false.obs,
-                        prefixIcon: FlutterRemix.lock_password_line,
-                        validator: (String? value) => validatePassword(
-                          value: value,
+                          hintText:
+                              AppStrings.setupApplockScreenPasswordHintText,
+                          controller:
+                              _setupAppLockController.passwordController,
                           focusNode: _setupAppLockController.passwordFocusNode,
-                        ),
-                      ),
+                          keyboardType: TextInputType.name,
+                          isPasswordVisible: false.obs,
+                          isPassword: true,
+                          hasFocus: false.obs,
+                          prefixIcon: FlutterRemix.lock_password_line,
+                          validator: (String? value) {
+                            return validateMasterPassword(
+                              value,
+                              _setupAppLockController.passwordFocusNode,
+                            );
+                          }),
                       SizedBox(
                         height: 16.h,
                       ),
@@ -144,22 +153,32 @@ class SetupAppLockScreen extends StatelessWidget {
                                       .validate()) {
                                     _setupAppLockController
                                         .isContinueButtonLoading.value = true;
-                                    await UserServices.updateUser(
-                                      data: {
-                                        'app_lock_password':
-                                            _setupAppLockController
-                                                .passwordController.text
-                                                .trim(),
-                                      },
-                                    );
-                                    _setupAppLockController.passwordController
-                                        .clear();
-                                    _setupAppLockController
-                                        .confirmPasswordController
-                                        .clear();
-                                    Get.to(() => MainScreen());
-                                    _setupAppLockController
-                                        .isContinueButtonLoading.value = false;
+                                    try {
+                                      await UserServices.updateUser(
+                                        data: {
+                                          'app_lock_password':
+                                              _setupAppLockController
+                                                  .passwordController.text,
+                                        },
+                                      );
+                                      _setupAppLockController.passwordController
+                                          .clear();
+                                      _setupAppLockController
+                                          .confirmPasswordController
+                                          .clear();
+                                      _setupAppLockController
+                                          .isContinueButtonLoading
+                                          .value = false;
+                                      await Get.to(() => MainScreen());
+                                    } catch (e) {
+                                      await EasyLoading.showInfo(
+                                        AppStrings
+                                            .setupApplockScreenErrorUpdatingMasterPassword,
+                                        duration: const Duration(
+                                          seconds: 5,
+                                        ),
+                                      );
+                                    }
                                   }
                                 },
                               )

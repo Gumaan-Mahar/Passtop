@@ -1,9 +1,10 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:passtop/controllers/home_controller.dart';
 import 'package:passtop/controllers/watch_tower_controller.dart';
 import 'package:passtop/models/password.dart';
 import 'package:passtop/screens/home_screen/components/password_category.dart';
+import 'package:passtop/services/preferences_services.dart';
 
 import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
@@ -14,10 +15,18 @@ class PasswordsServices {
       await supabase.from('passwords').insert(password.toJson());
     } on PostgrestException catch (error) {
       await EasyLoading.showInfo(error.message);
-      log(error.message);
+    } on SocketException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
+    } on HttpException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
     } catch (e) {
-      await EasyLoading.showInfo('An unexpected error occurred.');
-      log(e.toString());
+      await EasyLoading.showInfo(
+        'Something went wrong. Try again later',
+      );
     }
   }
 
@@ -29,10 +38,18 @@ class PasswordsServices {
           );
     } on PostgrestException catch (error) {
       await EasyLoading.showInfo(error.message);
-      log(error.message);
+    } on SocketException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
+    } on HttpException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
     } catch (e) {
-      await EasyLoading.showInfo('An unexpected error occurred.');
-      log(e.toString());
+      await EasyLoading.showInfo(
+        'Something went wrong. Try again later',
+      );
     }
   }
 
@@ -44,10 +61,18 @@ class PasswordsServices {
           );
     } on PostgrestException catch (error) {
       await EasyLoading.showInfo(error.message);
-      log(error.message);
+    } on SocketException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
+    } on HttpException {
+      await EasyLoading.showInfo(
+        'A server or network error occurred. Try again later.',
+      );
     } catch (e) {
-      await EasyLoading.showInfo('An unexpected error occurred.');
-      log(e.toString());
+      await EasyLoading.showInfo(
+        'Something went wrong. Try again later',
+      );
     }
   }
 
@@ -63,8 +88,8 @@ class PasswordsServices {
     return passwords;
   }
 
-  static void subscribeToPasswordsChannel({required List passwords}) {
-    final HomeController homeController = Get.find();
+  static void subscribeToPasswordsChannel(
+      {required List passwords, required HomeController homeController}) {
     final WatchTowerController watchTowerController =
         Get.put(WatchTowerController());
     supabase
@@ -76,7 +101,7 @@ class PasswordsServices {
               schema: 'public',
               table: 'passwords',
               filter: 'user_id=eq.${supabase.auth.currentUser?.id}',
-            ), (payload, [ref]) {
+            ), (payload, [ref]) async {
       PasswordModel password = PasswordModel.fromJson(json: payload['new']);
       final category = PasswordCategory(
           category: password.category, controller: homeController);
@@ -95,6 +120,7 @@ class PasswordsServices {
                               : null;
       passwords.add(password);
       watchTowerController.passwords.add(password);
+      await PreferencesServices().updatePasswordModelList(passwords);
       watchTowerController.updateTotalScore();
       homeController.refreshRecentPasswords(
         recentPasswordsList: homeController.recentPasswords,
@@ -116,6 +142,8 @@ class PasswordsServices {
           recentPasswordsList: homeController.recentPasswords,
           passwordsList: homeController.passwords,
         );
+        await PreferencesServices()
+            .updatePasswordModelList(homeController.passwords);
       },
     ).on(
       RealtimeListenTypes.postgresChanges,
@@ -129,6 +157,7 @@ class PasswordsServices {
         PasswordModel password = PasswordModel.fromJson(json: payload['new']);
         homeController.updatePasswordListEdit(password);
         await watchTowerController.updatePasswordListEdit(password);
+        PreferencesServices().updatePasswordModelList(homeController.passwords);
       },
     ).subscribe();
   }
