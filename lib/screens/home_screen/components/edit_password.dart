@@ -1,4 +1,5 @@
 import 'package:passtop/controllers/edit_password_controller.dart';
+import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/models/password.dart';
 import 'package:passtop/screens/home_screen/components/password_category.dart';
@@ -18,6 +19,8 @@ class EditPassword extends StatelessWidget {
 
   final EditPasswordController editPasswordController =
       Get.put(EditPasswordController());
+
+  final InitializationController initializationController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -361,7 +364,10 @@ class EditPassword extends StatelessWidget {
                           .newPasswordNotesController.text,
                     );
                     await PasswordsServices.updatePassword(
-                        password: passwordModel);
+                      password: passwordModel,
+                      encryptionKey:
+                          initializationController.encryptionKey.value!,
+                    );
                     await Future.delayed(
                       const Duration(
                         seconds: 1,

@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
@@ -7,7 +6,6 @@ import 'package:passtop/methods/calculate_password_score.dart';
 import 'package:passtop/services/passwords_services.dart';
 
 import '../models/password.dart';
-import '../services/preferences_services.dart';
 
 class WatchTowerController extends GetxController {
   RxDouble passwordsTotalScore = 0.0.obs;
@@ -28,28 +26,24 @@ class WatchTowerController extends GetxController {
     isFetching.value = true;
     final currentUser = supabase.auth.currentUser;
     if (currentUser != null) {
-      final bool? isPasswordsCached = Preferences().instance?.containsKey('password_list');
-      if (initializationController.connectionStatus.value ==
-          ConnectivityResult.none && isPasswordsCached!) {
-        passwords.value = await PreferencesServices().fetchPasswordModelList();
-      } else {
-        passwords.value = await PasswordsServices.fetchPasswords(
-          userId: currentUser.id,
-        );
-      }
+      passwords.value = await PasswordsServices.fetchPasswords(
+        userId: currentUser.id,
+        encryptionKey: initializationController.encryptionKey.value!,
+      );
     }
     passwordsTotalScore.value = await calculateTotalScore();
     isFetching.value = false;
   }
 
   Future<double> calculateTotalScore() async {
+    final List<dynamic> passwordsCopy = List.from(passwords);
     int totalScore = 0;
     int totalPasswords = 0;
     final List<dynamic> reused = [];
     final List<dynamic> common = [];
     final List<dynamic> weak = [];
 
-    for (var password in passwords) {
+    for (var password in passwordsCopy) {
       if (password.category == 'App' || password.category == 'Browser') {
         Map<String, dynamic> passwordStatus =
             await calculatePasswordScore(password.password);

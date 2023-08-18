@@ -3,20 +3,24 @@ import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/screens/initial_screen.dart/initial_screen.dart';
 
 import 'core/imports/packages_imports.dart';
-import 'core/instances.dart';
 import 'core/themes/themes.dart';
 
-Future<void> main() async {
+main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   Get.put(InitializationController());
-  await Preferences().init();
   FlutterNativeSplash.remove();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final InitializationController initializationController = Get.find();
 
   @override
@@ -38,7 +42,7 @@ class MyApp extends StatelessWidget {
           theme: Themes.dark,
           debugShowCheckedModeBanner: false,
           useInheritedMediaQuery: true,
-          home: const InitialScreen(),
+          home: InitialScreen(),
           builder: EasyLoading.init(),
         );
       },

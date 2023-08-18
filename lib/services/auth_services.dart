@@ -6,25 +6,6 @@ import 'package:passtop/core/imports/core_imports.dart';
 import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
 
-// class AuthServices {
-//   static Future<void> continueWithGoogle(
-//       {required BuildContext context}) async {
-//     try {
-//       await supabase.auth.signInWithOAuth(
-//         Provider.google,
-//         redirectTo: kIsWeb
-//             ? null
-//             : 'https://dabpyizqziezyyqxjkqn.supabase.co/auth/v1/callback',
-//         authScreenLaunchMode: LaunchMode.platformDefault,
-//         context: context,
-//       );
-//     } catch (e) {
-//       await EasyLoading.showInfo('Unexpected error occured while signing you in.');
-//       log(e.toString());
-//     }
-//   }
-// }
-
 class AuthServices {
   static bool isAuthenticating = false;
 
@@ -42,10 +23,9 @@ class AuthServices {
     try {
       await supabase.auth.signInWithOAuth(
         Provider.google,
-        redirectTo: kIsWeb
-            ? null
-            : 'https://dabpyizqziezyyqxjkqn.supabase.co/auth/v1/callback',
-        authScreenLaunchMode: LaunchMode.platformDefault,
+        // redirectTo: kIsWeb
+        //     ? null
+        //     : 'https://dabpyizqziezyyqxjkqn.supabase.co/auth/v1/callback',
         context: context,
       );
     } catch (error) {

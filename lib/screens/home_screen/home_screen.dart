@@ -27,6 +27,7 @@ class HomeScreen extends StatelessWidget {
                 backgroundColor: AppColors.secondaryColor,
                 automaticallyImplyLeading: false,
                 expandedHeight: Get.height * 0.4,
+                collapsedHeight: kToolbarHeight,
                 snap: true,
                 floating: true,
                 shape: const RoundedRectangleBorder(
@@ -35,7 +36,12 @@ class HomeScreen extends StatelessWidget {
                     bottomRight: Radius.circular(10.0),
                   ),
                 ),
+                stretch: true,
                 flexibleSpace: FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.symmetric(
+                    vertical: 16.h,
+                    horizontal: 16.w,
+                  ),
                   background: Padding(
                     padding: EdgeInsets.all(8.w),
                     child: Obx(
@@ -99,9 +105,11 @@ class HomeScreen extends StatelessWidget {
               FlutterRemix.add_line,
               color: AppColors.primaryColorShade200,
             ),
-            onPressed: () => displayBottomSheet(
-              context,
-            ),
+            onPressed: () async {
+              await displayBottomSheet(
+                context,
+              );
+            },
           ),
         ),
       ),

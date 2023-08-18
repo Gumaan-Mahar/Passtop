@@ -57,7 +57,8 @@ Future<dynamic> displayBottomSheet(BuildContext context) {
                     slivers: [
                       SliverFillRemaining(
                         hasScrollBody: false,
-                        child: NewPasswordForm(),
+                        child: NewPasswordForm(
+                        ),
                       ),
                     ],
                   ),

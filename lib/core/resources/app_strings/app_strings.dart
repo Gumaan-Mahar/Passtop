@@ -27,7 +27,7 @@ class AppStrings {
   static const setupApplockScreenPasswordsDontMatch = "Passwords don't match";
   static const setupApplockScreenContinueButton = "Continue";
   static const setupApplockScreenErrorUpdatingMasterPassword =
-      "Sorry, we couldn't update your app lock password. Please check your internet connection and try again later.";
+      "Sorry, something went wrong. Please, try again.";
 
   // Home Screen
   static const homeScreenNoRecentPasswords =

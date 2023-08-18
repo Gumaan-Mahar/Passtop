@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/services.dart';
-import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/settings_controller.dart';
 import 'package:passtop/screens/settings_screen/components/change_master_password_dialog.dart';
 import 'package:passtop/screens/settings_screen/components/delete_account_dialog.dart';
@@ -59,16 +56,14 @@ class SettingsScreen extends StatelessWidget {
                       icon: FlutterRemix.lock_password_line,
                       showTrailing: true,
                       onPressed: () async {
-                        InitializationController initializationController =
-                            Get.find();
-                        log("current status: ${initializationController.currentUser.value!.appLockPassword}");
                         await showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           useSafeArea: true,
                           backgroundColor: Colors.transparent,
                           builder: (BuildContext context) {
-                            return ChangeMasterPasswordDialog();
+                            return ChangeMasterPasswordDialog(
+                            );
                           },
                         );
                       },

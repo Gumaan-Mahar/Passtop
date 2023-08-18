@@ -1,4 +1,6 @@
+import 'package:passtop/controllers/home_controller.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
+import 'package:passtop/controllers/watch_tower_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/widgets/custom_button.dart';
 
@@ -9,6 +11,8 @@ class LogoutAlertDialog extends StatelessWidget {
   LogoutAlertDialog({super.key});
 
   final InitializationController initializationController = Get.find();
+  final HomeController homeController = Get.find();
+  final WatchTowerController watchTowerController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +66,12 @@ class LogoutAlertDialog extends StatelessWidget {
           onPressed: () async {
             Get.back();
             await EasyLoading.show(status: 'Logging out...');
+            homeController.passwords.clear();
+            homeController.recentPasswords.clear();
+            watchTowerController.passwords.clear();
+            watchTowerController.commonPasswords.clear();
+            watchTowerController.weakPasswords.clear();
+            watchTowerController.reusedPasswords.clear();
             await UserServices.signOut(
               controller: initializationController,
             );

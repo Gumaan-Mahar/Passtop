@@ -1,8 +1,11 @@
 import 'dart:developer';
 
+import 'package:passtop/controllers/home_controller.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/settings_controller.dart';
+import 'package:passtop/controllers/watch_tower_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
+import 'package:passtop/core/instances.dart';
 import 'package:passtop/methods/validate_master_password.dart';
 import 'package:passtop/services/user_services.dart';
 import 'package:passtop/widgets/custom_button.dart';
@@ -11,14 +14,17 @@ import 'package:passtop/widgets/custom_textfield.dart';
 import '../../../core/imports/core_imports.dart';
 
 class ChangeMasterPasswordDialog extends StatelessWidget {
-  ChangeMasterPasswordDialog({super.key});
+  ChangeMasterPasswordDialog({
+    super.key,
+  });
 
   final SettingsController settingsController = Get.find();
   final InitializationController initializationController = Get.find();
+  final HomeController homeController = Get.find();
+  final WatchTowerController watchTowerController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    log('crrnt usr: ${initializationController.currentUser.value!.username}');
     return Stack(
       alignment: AlignmentDirectional.bottomEnd,
       children: [
@@ -92,13 +98,23 @@ class ChangeMasterPasswordDialog extends StatelessWidget {
                           prefixIcon: FlutterRemix.lock_password_line,
                           isPassword: true,
                           validator: (String? value) {
-                            if (value !=
+                            if (value == null || value.isEmpty) {
+                              return AppStrings.homeScreenThisFieldIsRequired;
+                            } else {
+                              final hashedPassword =
+                                  encryptionServices.hashMasterPassword(
+                                value,
                                 initializationController
-                                    .currentUser.value!.appLockPassword) {
-                              settingsController.currentPasswordFocusNode
-                                  .requestFocus();
-                              return AppStrings
-                                  .settingsScreenInvalidCurrentPassword;
+                                    .currentUser.value!.salt,
+                              );
+                              if (hashedPassword !=
+                                  initializationController
+                                      .currentUser.value!.masterPassword) {
+                                settingsController.currentPasswordFocusNode
+                                    .requestFocus();
+                                return AppStrings
+                                    .settingsScreenInvalidCurrentPassword;
+                              }
                             }
                             return null;
                           },
@@ -158,25 +174,29 @@ class ChangeMasterPasswordDialog extends StatelessWidget {
                       width: Get.width * 0.8,
                       text: 'Save Changes',
                       onPressed: () async {
-                        if (settingsController.formKey.currentState!
-                            .validate()) {
+                        await EasyLoading.show(status: 'Verifying...');
+                        final isValid =
+                            settingsController.formKey.currentState!.validate();
+                        await EasyLoading.dismiss();
+                        if (isValid) {
                           await EasyLoading.show(status: 'Saving Changes');
-                          await UserServices.updateUser(
-                            data: {
-                              'app_lock_password': settingsController
-                                  .confirmNewPasswordController.text
-                                  .trim(),
-                            },
-                          );
+                          try {
+                            settingsController.migrateDataAfterPasswordChange(
+                              newMasterPassword:
+                                  settingsController.newPasswordController.text,
+                              passwords: homeController.passwords,
+                              initializationController: initializationController,
+                              homeController: homeController,
+                              watchTowerController: watchTowerController,
+                            );
+                            await EasyLoading.dismiss();
+                          } catch (e) {
+                            await EasyLoading.showError(
+                                'Unexpected error occurred while changing password. Try again later.');
+                          }
+
                           settingsController.clearTextFields();
-                          await EasyLoading.dismiss();
                           Get.back();
-                          await EasyLoading.showToast(
-                            AppStrings
-                                .settingsScreenPasswordSuccessfullyChanged,
-                            duration: const Duration(seconds: 3),
-                            toastPosition: EasyLoadingToastPosition.top,
-                          );
                         }
                       },
                     ),

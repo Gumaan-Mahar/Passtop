@@ -1,5 +1,6 @@
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/settings_controller.dart';
+import 'package:passtop/core/instances.dart';
 import 'package:passtop/services/user_services.dart';
 
 import '../../../core/imports/core_imports.dart';
@@ -115,14 +116,22 @@ class DeleteAccountDialog extends StatelessWidget {
                               if (value!.isEmpty) {
                                 return AppStrings
                                     .setupApplockScreenPasswordIsRequired;
-                              } else if (value !=
+                              } else {
+                                final hashedPassword =
+                                    encryptionServices.hashMasterPassword(
+                                  value,
                                   initializationController
-                                      .currentUser.value!.appLockPassword) {
-                                settingsController
-                                    .currentPasswordFocusNodeDelete
-                                    .requestFocus();
-                                return AppStrings
-                                    .settingsScreenInvalidCurrentPassword;
+                                      .currentUser.value!.salt,
+                                );
+                                if (hashedPassword !=
+                                    initializationController
+                                        .currentUser.value!.masterPassword) {
+                                  settingsController
+                                      .currentPasswordFocusNodeDelete
+                                      .requestFocus();
+                                  return AppStrings
+                                      .settingsScreenInvalidCurrentPassword;
+                                }
                               }
                               return null;
                             },
@@ -135,8 +144,13 @@ class DeleteAccountDialog extends StatelessWidget {
                       text: 'Delete Account',
                       color: AppColors.shadeDanger,
                       onPressed: () async {
-                        if (settingsController.formKeyDelete.currentState!
-                            .validate()) {
+                        await EasyLoading.show(status: "Verifying...");
+                        final isValid = settingsController
+                            .formKeyDelete.currentState!
+                            .validate();
+                        await EasyLoading.dismiss();
+                        if (isValid) {
+                          await EasyLoading.show(status: "Deleting account...");
                           Get.back();
                           await EasyLoading.show(
                             status: AppStrings.settingsScreenDeletingAccount,

@@ -1,4 +1,3 @@
-
 import 'package:passtop/controllers/home_controller.dart';
 
 import '../../../core/imports/core_imports.dart';
@@ -12,7 +11,9 @@ import '../../../widgets/expiry_month_drop_down.dart';
 import '../../../widgets/expiry_year_drop_down.dart';
 
 class NewPasswordForm extends StatelessWidget {
-  NewPasswordForm({super.key});
+  NewPasswordForm({
+    super.key,
+  });
 
   final HomeController homeController = Get.find();
 
@@ -585,6 +586,7 @@ class NewPasswordForm extends StatelessWidget {
           marginBottom: 8.h,
           text: AppStrings.homeScreenContinueButton,
           onPressed: () async {
+            FocusScope.of(context).unfocus();
             if (homeController.formKey.currentState!.validate()) {
               await homeController.handleAddNewPassword();
             }

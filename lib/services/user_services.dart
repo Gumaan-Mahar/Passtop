@@ -1,60 +1,54 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:http/http.dart' as http;
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/instances.dart';
 import 'package:passtop/models/user.dart';
-import 'package:passtop/services/preferences_services.dart';
 
 import '../controllers/initialization_controller.dart';
 import '../screens/signin_screen/signin_screen.dart';
 
 class UserServices {
-  static const int maxRetries = 3;
-  static const Duration retryDelay = Duration(seconds: 2);
-
-  static Future<void> getCurrentUser({required String userId}) async {
-    final InitializationController initializationController = Get.find();
-    final bool isUserCached =
-        Preferences().instance?.containsKey('user_model') ?? false;
-
-    bool hasStableConnection = false;
-    int retryCount = 0;
-
-    if (initializationController.connectionStatus.value ==
-            ConnectivityResult.none &&
-        isUserCached) {
-      initializationController.currentUser.value =
-          await PreferencesServices().fetchCurrentUser();
-      return;
-    }
-
-    while (!hasStableConnection && retryCount < maxRetries) {
-      try {
-        final data =
-            await supabase.from('users').select().eq('id', userId).single();
-        final user = UserModel.fromJson(data as Map<String, dynamic>);
-        await PreferencesServices().updateUserModel(user);
-        initializationController.currentUser.value = user;
-        hasStableConnection = true;
-      } on PostgrestException catch (error) {
-        if (error is TimeoutException) {
-          retryCount++;
-          await Future.delayed(retryDelay);
-        } else {
-          await EasyLoading.showError('Error: ${error.message}');
-          log(error.message);
-          rethrow;
-        }
-      } catch (error) {
-        await EasyLoading.showError('Unexpected exception occurred');
-        log(error.toString());
-      }
-    }
-
-    if (!hasStableConnection) {
-      await EasyLoading.showError('No stable internet connection');
+  static Future<void> getCurrentUser(
+      {required String userId,
+      required InitializationController controller}) async {
+    try {
+      final jsonData = await supabase
+          .from('users')
+          .select()
+          .eq('id', userId)
+          .single() as Map<String, dynamic>;
+      final user = UserModel.fromJson(jsonData);
+      controller.currentUser.value = user;
+    } on PostgrestException catch (error) {
+      await EasyLoading.showError('Error: ${error.message}');
+      log(error.message);
+    } on SocketException catch (error) {
+      await EasyLoading.showError(
+        'Unable to connect to the server. Please check your internet connection and try again.',
+        duration: const Duration(
+          seconds: 3,
+        ),
+      );
+      log('Socket Exception: ${error.message}');
+    } on http.ClientException catch (error) {
+      await EasyLoading.showError(
+        'Unable to establish a connection with the server. Please try again later.',
+        duration: const Duration(
+          seconds: 3,
+        ),
+      );
+      log('Client Exception: ${error.message}');
+    } catch (error) {
+      await EasyLoading.showError(
+        'Unexpected exception occurred',
+        duration: const Duration(
+          seconds: 3,
+        ),
+      );
+      log(error.toString());
     }
   }
 
@@ -64,11 +58,20 @@ class UserServices {
       await supabase.from('users').update(data).eq('id', userId);
     } on PostgrestException catch (error) {
       final errorMessage = error.message;
-      await EasyLoading.showInfo('Failed to update user: $errorMessage');
+      await EasyLoading.showInfo(
+        'Failed to update user: $errorMessage',
+        duration: const Duration(
+          seconds: 3,
+        ),
+      );
       log(errorMessage);
     } catch (error) {
       await EasyLoading.showInfo(
-          'Unexpected exception occured while updating user');
+        'Unexpected exception occured while updating user',
+        duration: const Duration(
+          seconds: 3,
+        ),
+      );
     }
   }
 
@@ -76,35 +79,21 @@ class UserServices {
       {required InitializationController controller}) async {
     try {
       final userId = supabase.auth.currentUser!.id;
-
-      // Delete user passwords first
-      try {
-        await UserServices.unsubscribeFromCurrentUserChannel();
-        await supabase
-            .from('passwords')
-            .delete()
-            .eq('user_id', userId)
-            .select();
-      } catch (passwordsError) {
-        await EasyLoading.showInfo(
-            'Something went wrong while deleting your account. Try again.');
-        log(passwordsError.toString());
-        return; // Stop further execution if there was an error deleting passwords
-      }
-
-      try {
-        await supabase.rpc('delete_user');
-        await signOut(controller: controller);
-      } catch (rpcError) {
-        await EasyLoading.showInfo(
-            'Your passwords were deleted successfully, but something went wrong while deleting your account. Try again.');
-        log(rpcError.toString());
-      }
+      await deletePasswords(userId);
+      await supabase.rpc('delete_user');
+      await signOut(controller: controller);
+      Get.offAll(() => SigninScreen());
+      await EasyLoading.showToast("You account was successfully deleted!");
     } on PostgrestException catch (error) {
-      final errorMessage = error.message;
       await EasyLoading.showInfo(
-          'Failed to delete your account: $errorMessage');
-      log(errorMessage);
+          'Failed to delete your account: ${error.message}');
+      log(error.message);
+    } on http.ClientException catch (error) {
+      await EasyLoading.showError(
+        'Unable to establish a connection with the server. Please try again later.',
+        duration: const Duration(seconds: 3),
+      );
+      log('Client Exception: ${error.message}');
     } catch (error) {
       await EasyLoading.showInfo(
           'Unexpected exception occurred while deleting your account.');
@@ -112,11 +101,23 @@ class UserServices {
     }
   }
 
+  static Future<void> deletePasswords(String userId) async {
+    try {
+      await UserServices.unsubscribeFromCurrentUserChannel();
+      await supabase.from('passwords').delete().eq('user_id', userId).select();
+    } catch (passwordsError) {
+      await EasyLoading.showInfo(
+          'An unexpected error occurred while deleting your account. Try again later.');
+      log(passwordsError.toString());
+      rethrow; // Stop further execution if there was an error deleting passwords
+    }
+  }
+
   static Future<void> signOut(
       {required InitializationController controller}) async {
     try {
-      await PreferencesServices().clearUserData();
       controller.currentUser.value = null;
+      controller.encryptionKey.value = null;
       await supabase.auth.signOut();
       await EasyLoading.dismiss();
       Get.offAll(() => SigninScreen());
@@ -126,6 +127,12 @@ class UserServices {
       log(errorMessage);
     } on PostgrestException catch (error) {
       await EasyLoading.showInfo(error.message);
+    } on http.ClientException catch (error) {
+      await EasyLoading.showError(
+        'Unable to establish a connection with the server. Please try again later.',
+        duration: const Duration(seconds: 3),
+      );
+      log('Client Exception: ${error.message}');
     } catch (error) {
       await EasyLoading.showInfo('Unexpected error occurred during sign out');
     }
@@ -143,8 +150,10 @@ class UserServices {
       ),
       (payload, [ref]) async {
         log('user updated: $payload');
-        final updatedUser = UserModel.fromJson(payload['new']);
-        await controller.refreshCurrentUser(updatedUser: updatedUser);
+        final updatedUser = UserModel.fromJson(
+          payload['new'],
+        );
+        controller.refreshCurrentUser(updatedUser: updatedUser);
       },
     ).on(
       RealtimeListenTypes.postgresChanges,

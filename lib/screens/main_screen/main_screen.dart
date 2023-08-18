@@ -1,6 +1,5 @@
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/services.dart';
-import 'package:passtop/controllers/applock_controller.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/search_controller.dart';
 
@@ -12,7 +11,6 @@ import '../../methods/handle_will_pop_scope.dart';
 class MainScreen extends StatelessWidget {
   MainScreen({super.key});
 
-  final AppLockController _appLockContoller = Get.find();
   final MainController _mainContoller = Get.put(MainController());
   final PasswordSearchController _passwordSearchController =
       Get.put(PasswordSearchController());
@@ -26,7 +24,6 @@ class MainScreen extends StatelessWidget {
         statusBarColor: context.theme.scaffoldBackgroundColor,
       ),
     );
-    _appLockContoller.isContinueButtonLoading.value = false;
     return WillPopScope(
       onWillPop: () async {
         _passwordSearchController.hideSuggestionsBox.value = true;
@@ -36,7 +33,7 @@ class MainScreen extends StatelessWidget {
       },
       child: Scaffold(
         body: Obx(
-          () => _mainContoller
+          () =>  _mainContoller
               .screens[_mainContoller.selectedNavBarTabIndex.value],
         ),
         bottomNavigationBar: Obx(

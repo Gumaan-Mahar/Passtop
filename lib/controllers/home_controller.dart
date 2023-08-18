@@ -1,10 +1,7 @@
-
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/models/password.dart';
 import 'package:passtop/services/passwords_services.dart';
-import 'package:passtop/services/preferences_services.dart';
 
 import '../core/imports/packages_imports.dart';
 import '../core/instances.dart';
@@ -12,7 +9,6 @@ import '../core/instances.dart';
 class HomeController extends GetxController {
   RxList passwords = [].obs;
   RxList recentPasswords = [].obs;
-
   final List<String> categories = [
     'App',
     'Browser',
@@ -21,7 +17,6 @@ class HomeController extends GetxController {
     'Address',
     'General',
   ];
-
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
@@ -37,23 +32,17 @@ class HomeController extends GetxController {
 
   final InitializationController initializationController = Get.find();
 
+  RxBool isAppBarCollapsed = false.obs;
+
   @override
   void onInit() async {
     isPasswordsFetching.value = true;
     final currentUser = supabase.auth.currentUser;
     if (currentUser != null) {
-      final bool? isPasswordsCached =
-          Preferences().instance?.containsKey('password_list');
-      if (initializationController.connectionStatus.value ==
-              ConnectivityResult.none &&
-          isPasswordsCached!) {
-        passwords.value = await PreferencesServices().fetchPasswordModelList();
-      } else {
-        passwords.value = await PasswordsServices.fetchPasswords(
-          userId: currentUser.id,
-        );
-      }
-      await PreferencesServices().updatePasswordModelList(passwords);
+      passwords.value = await PasswordsServices.fetchPasswords(
+        userId: currentUser.id,
+        encryptionKey: initializationController.encryptionKey.value!,
+      );
       appsPasswordsTotal.value = passwords
           .where((password) => password.category == categories[0])
           .length;
@@ -149,11 +138,13 @@ class HomeController extends GetxController {
       generalText: newPasswordGeneralTextController.text,
       notes: newPasswordNotesController.text,
     );
-    await PasswordsServices.savePassword(password: password);
+    await PasswordsServices.savePassword(
+        password: password,
+        encryptionKey: initializationController.encryptionKey.value!);
     newPasswordSelectedCategory.value = categories[0];
     await Future.delayed(
       const Duration(
-        seconds: 1,
+        seconds: 3,
       ),
     );
     clearTextFields();
