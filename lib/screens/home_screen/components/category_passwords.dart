@@ -43,72 +43,74 @@ class _CategoryPasswordsState extends State<CategoryPasswords> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: AppColors.secondaryColor,
-        systemNavigationBarColor: AppColors.customDarkColor,
-      ),
-      child: SafeArea(
-        child: Scaffold(
-          key: homeController.scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: AppColors.secondaryColor,
-            title: Text(
-              widget.title,
-              style: context.theme.textTheme.titleMedium!.copyWith(
-                color: AppColors.primaryColorShade200,
-              ),
-            ),
-            centerTitle: true,
-          ),
-          body: Obx(
-            () => homeController.isPasswordsFetching.value
-                ? Center(
-                    child: LoadingAnimationWidget.staggeredDotsWave(
-                      color: AppColors.primaryColor,
-                      size: 28.w,
-                    ),
-                  )
-                : homeController.passwords
-                        .where(
-                            (password) => password.category == widget.category)
-                        .toList()
-                        .isEmpty
-                    ? Center(
-                        child: Text(
-                          AppStrings.homeScreenNoPasswords,
-                          style: context.theme.textTheme.bodyLarge!.copyWith(
-                            color: AppColors.primaryColorShade300,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        key: homeController.listKey,
-                        controller: homeController.passwordsScrollController,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                        itemCount: homeController.passwords.length,
-                        itemBuilder: (context, index) {
-                          PasswordCategory passwordCategory = PasswordCategory(
-                            category: homeController.passwords[index].category,
-                            controller: homeController,
-                          );
-                          return homeController.passwords[index].category ==
-                                  widget.category
-                              ? PasswordTileDetail(
-                                  key: ValueKey(
-                                      homeController.passwords[index].id),
-                                  password: homeController.passwords[index],
-                                  category: passwordCategory,
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      ),
+    return Scaffold(
+      key: homeController.scaffoldKey,
+      appBar: AppBar(
+        backgroundColor: AppColors.secondaryColor,
+        title: Text(
+          widget.title,
+          style: context.theme.textTheme.titleMedium!.copyWith(
+            color: AppColors.primaryColorShade200,
           ),
         ),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(
+            FlutterRemix.arrow_left_s_line,
+            size: 32.w,
+            color: AppColors.primaryColorShade300,
+          ),
+        ),
+        centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+          statusBarColor: AppColors.secondaryColor,
+          systemNavigationBarColor: AppColors.customDarkColor,
+        ),
+      ),
+      body: Obx(
+        () => homeController.isPasswordsFetching.value
+            ? Center(
+                child: LoadingAnimationWidget.staggeredDotsWave(
+                  color: AppColors.primaryColor,
+                  size: 28.w,
+                ),
+              )
+            : homeController.passwords
+                    .where((password) => password.category == widget.category)
+                    .toList()
+                    .isEmpty
+                ? Center(
+                    child: Text(
+                      AppStrings.homeScreenNoPasswords,
+                      style: context.theme.textTheme.bodyLarge!.copyWith(
+                        color: AppColors.primaryColorShade300,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    key: homeController.listKey,
+                    controller: homeController.passwordsScrollController,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 8.h,
+                    ),
+                    itemCount: homeController.passwords.length,
+                    itemBuilder: (context, index) {
+                      PasswordCategory passwordCategory = PasswordCategory(
+                        category: homeController.passwords[index].category,
+                        controller: homeController,
+                      );
+                      return homeController.passwords[index].category ==
+                              widget.category
+                          ? PasswordTileDetail(
+                              key: ValueKey(homeController.passwords[index].id),
+                              password: homeController.passwords[index],
+                              category: passwordCategory,
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
       ),
     );
   }

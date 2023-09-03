@@ -1,16 +1,12 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:math' as math;
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/services.dart';
-import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:pointycastle/key_derivators/pbkdf2.dart';
 import 'package:pointycastle/macs/hmac.dart';
 import 'package:pointycastle/pointycastle.dart';
 import 'package:convert/convert.dart';
-
-import '../core/instances.dart';
 
 class EncryptionServices {
   String hashMasterPassword(String masterPassword, String salt) {
@@ -49,7 +45,6 @@ class EncryptionServices {
       throw Exception(
           'Invalid encryption key: Key length must be 32 bytes (256 bits).');
     }
-    log('Encryption Key: $encryptionKey');
     final key = Key(encryptionKey);
     final iv = IV.fromSecureRandom(16);
 
@@ -88,21 +83,5 @@ class EncryptionServices {
     });
 
     return String.fromCharCodes(saltCodeUnits);
-  }
-
-  Future<void> updateEncryptedPasswords({
-    required String userId,
-    required List<dynamic> reEncryptedPasswords,
-    required Uint8List newEncryptionKey,
-  }) async {
-    try {
-      final response = await supabase
-          .from('passwords')
-          .upsert(reEncryptedPasswords)
-          .select();
-      log('new encrypted data returned: $response');
-    } catch (e) {
-      
-    }
   }
 }

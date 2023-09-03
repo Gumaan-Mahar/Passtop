@@ -1,3 +1,4 @@
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../imports/core_imports.dart';
@@ -11,7 +12,6 @@ final ThemeData darkTheme = ThemeData.dark().copyWith(
   appBarTheme: const AppBarTheme(
     elevation: 0,
     backgroundColor: AppColors.customDarkColor,
-    iconTheme: IconThemeData(color: AppColors.primaryColor),
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
     color: AppColors.primaryColor,

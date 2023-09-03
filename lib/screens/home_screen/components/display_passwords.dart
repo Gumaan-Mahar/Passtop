@@ -27,23 +27,54 @@ class DisplayPasswordsStream extends StatelessWidget {
                 ),
               )
             : homeController.recentPasswords.isEmpty
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      top: Get.height * 0.22,
-                    ),
-                    child: SizedBox(
-                      width: Get.width * 0.8,
-                      child: Center(
-                        child: Text(
-                          AppStrings.homeScreenNoRecentPasswords,
-                          style: context.theme.textTheme.bodyLarge!.copyWith(
-                            color: AppColors.primaryColorShade300,
-                            fontWeight: FontWeight.w500,
+                ? homeController.isRetryingPasswordsFetch.value
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          !homeController.hasPasswordsFetchError.value
+                              ? Padding(
+                                  padding: EdgeInsets.only(
+                                    top: Get.height * 0.22,
+                                  ),
+                                  child: Center(
+                                    child: LoadingAnimationWidget
+                                        .staggeredDotsWave(
+                                      color: AppColors.primaryColor,
+                                      size: 28.w,
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                            height: 8.h,
+                          ),
+                          Text(
+                            homeController.passwordsFetchErrorMessage.value,
+                            style: context.theme.textTheme.bodyLarge!.copyWith(
+                              color: AppColors.primaryColorShade300,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Padding(
+                        padding: EdgeInsets.only(
+                          top: Get.height * 0.22,
+                        ),
+                        child: SizedBox(
+                          width: Get.width * 0.8,
+                          child: Center(
+                            child: Text(
+                              AppStrings.homeScreenNoRecentPasswords,
+                              style:
+                                  context.theme.textTheme.bodyLarge!.copyWith(
+                                color: AppColors.primaryColorShade300,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

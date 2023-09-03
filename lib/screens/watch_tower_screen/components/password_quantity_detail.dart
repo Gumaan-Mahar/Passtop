@@ -17,60 +17,67 @@ class PasswordQuantityDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: AppColors.secondaryColor,
-        systemNavigationBarColor: AppColors.customDarkColor,
-      ),
-      child: SafeArea(
-        child: Scaffold(
-          key: watchTowerController.scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: AppColors.secondaryColor,
-            centerTitle: true,
-            title: Text(
-              label,
-              style: context.theme.textTheme.titleMedium!.copyWith(
-                color: AppColors.primaryColorShade200,
-              ),
+    return SafeArea(
+      child: Scaffold(
+        key: watchTowerController.scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: AppColors.secondaryColor,
+          centerTitle: true,
+          title: Text(
+            label,
+            style: context.theme.textTheme.titleMedium!.copyWith(
+              color: AppColors.primaryColorShade200,
             ),
           ),
-          body: Obx(
-            () => passwords.isEmpty
-                ? Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                    ),
-                    child: Center(
-                      child: Text(
-                        AppStrings.homeScreenNoPasswords,
-                        textAlign: TextAlign.center,
-                        style: context.theme.textTheme.bodyLarge!.copyWith(
-                          color: AppColors.primaryColorShade300,
-                          fontWeight: FontWeight.w500,
-                        ),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () => Get.back(),
+            icon: Icon(
+              FlutterRemix.arrow_left_s_line,
+              size: 32.w,
+              color: AppColors.primaryColorShade300,
+            ),
+          ),
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            statusBarColor: AppColors.secondaryColor,
+            systemNavigationBarColor: AppColors.customDarkColor,
+          ),
+        ),
+        body: Obx(
+          () => passwords.isEmpty
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                  ),
+                  child: Center(
+                    child: Text(
+                      AppStrings.homeScreenNoPasswords,
+                      textAlign: TextAlign.center,
+                      style: context.theme.textTheme.bodyLarge!.copyWith(
+                        color: AppColors.primaryColorShade300,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: passwords.length,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 8.h,
-                    ),
-                    itemBuilder: (_, index) {
-                      final PasswordCategory category = PasswordCategory(
-                        category: passwords[index].category,
-                        controller: homeController,
-                      );
-                      return PasswordTileDetail(
-                        password: passwords[index],
-                        category: category,
-                        scaffoldKey: watchTowerController.scaffoldKey,
-                      );
-                    },
                   ),
-          ),
+                )
+              : ListView.builder(
+                  itemCount: passwords.length,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
+                  itemBuilder: (_, index) {
+                    final PasswordCategory category = PasswordCategory(
+                      category: passwords[index].category,
+                      controller: homeController,
+                    );
+                    return PasswordTileDetail(
+                      password: passwords[index],
+                      category: category,
+                      scaffoldKey: watchTowerController.scaffoldKey,
+                    );
+                  },
+                ),
         ),
       ),
     );

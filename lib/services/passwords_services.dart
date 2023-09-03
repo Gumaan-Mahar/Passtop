@@ -96,20 +96,71 @@ class PasswordsServices {
   static Future<List<dynamic>> fetchPasswords({
     required String userId,
     required Uint8List encryptionKey,
+    required RxBool isRetryingPasswordsFetch,
+    required RxBool hasPasswordsFetchError,
+    required RxString passwordsFetchErrorMessage,
   }) async {
     List<dynamic> passwords = [];
-    final passwordsData =
-        await supabase.from('passwords').select().eq('user_id', userId);
+    const maxRetries = 3;
+    int retryCount = 0;
+    bool isRetrying = false; // Track if a retry is in progress
 
-    for (final passwordIntoJson in passwordsData) {
-      final password = PasswordModel.fromJsonWithDecryption(
-        passwordIntoJson as Map<String, dynamic>,
-        encryptionKey,
-      );
-      passwords.add(password);
+    while (retryCount < maxRetries) {
+      try {
+        if (isRetrying) {
+          // If retrying, show "Retrying" message
+          isRetryingPasswordsFetch.value = true;
+        }
+
+        final passwordsData =
+            await supabase.from('passwords').select().eq('user_id', userId);
+
+        // Reset retry-related values on success
+        isRetryingPasswordsFetch.value = false;
+        hasPasswordsFetchError.value = false;
+        passwordsFetchErrorMessage.value = '';
+
+        for (final passwordIntoJson in passwordsData) {
+          final password = PasswordModel.fromJsonWithDecryption(
+            passwordIntoJson as Map<String, dynamic>,
+            encryptionKey,
+          );
+          passwords.add(password);
+        }
+        return passwords;
+      } on PostgrestException catch (_) {
+        hasPasswordsFetchError.value = true;
+        break; // No retry for PostgrestException, exit the loop
+      } on SocketException {
+        isRetrying = true; // Set isRetrying to true during retries
+        passwordsFetchErrorMessage.value =
+            'A server or network error occurred. Retrying...';
+        retryCount++;
+        await Future.delayed(
+            const Duration(seconds: 2)); // Wait for 2 seconds before retrying
+      } on HttpException {
+        isRetrying = true; // Set isRetrying to true during retries
+        passwordsFetchErrorMessage.value =
+            'A server or network error occurred. Retrying...';
+        retryCount++;
+        await Future.delayed(
+            const Duration(seconds: 2)); // Wait for 2 seconds before retrying
+      } catch (e) {
+        hasPasswordsFetchError.value = true;
+        passwordsFetchErrorMessage.value =
+            'Something went wrong. Try again later';
+        break; // Exit the loop on other exceptions
+      }
     }
 
-    return passwords;
+    // Set retry-related values back to false when max retries are reached
+    isRetryingPasswordsFetch.value = false;
+    if (retryCount >= maxRetries) {
+      hasPasswordsFetchError.value = true;
+      passwordsFetchErrorMessage.value =
+          'Failed to fetch passwords after retries.';
+    }
+    return passwords; // Return an empty list if all retries fail
   }
 
   static void subscribeToPasswordsChannel(

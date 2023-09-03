@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/services.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/instances.dart';
 import 'package:passtop/services/user_services.dart';
@@ -29,11 +30,17 @@ class InitialScreen extends StatelessWidget {
         () {
           if (initializationController.isCurrentUserLoading.value ||
               initializationController.isInitializing.value) {
-            return Scaffold(
-              body: Center(
-                child: LoadingAnimationWidget.staggeredDotsWave(
-                  color: AppColors.primaryColor,
-                  size: 28.w,
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.light.copyWith(
+                statusBarColor: AppColors.customDarkColor,
+                systemNavigationBarColor: AppColors.customDarkColor,
+              ),
+              child: Scaffold(
+                body: Center(
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    color: AppColors.primaryColor,
+                    size: 28.w,
+                  ),
                 ),
               ),
             );
@@ -47,29 +54,55 @@ class InitialScreen extends StatelessWidget {
               if (currentUser == null) {
                 return Scaffold(
                   body: Center(
-                    child: CustomButton(
-                      width: Get.width * 0.3,
-                      text: 'Try again',
-                      onPressed: () async {
-                        try {
-                          await EasyLoading.show(status: 'Retrying...');
-                          await UserServices.getCurrentUser(
-                            userId: supabase.auth.currentUser!.id,
-                            controller: initializationController,
-                          );
-                          await Future.delayed(const Duration(seconds: 2),
-                              () async {
-                            await EasyLoading.dismiss();
-                          });
-                        } catch (e) {
-                          await EasyLoading.showToast(
-                            'No stable internet connection, try again later.',
-                            duration: const Duration(
-                              seconds: 5,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: AppColors.primaryColorShade300,
+                          size: Get.width * 0.3,
+                        ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        SizedBox(
+                          width: Get.width * 0.8,
+                          child: Text(
+                            AppStrings.initialScreenIssue,
+                            textAlign: TextAlign.center,
+                            style: context.theme.textTheme.labelLarge!.copyWith(
+                              color: AppColors.primaryColorShade300,
                             ),
-                          );
-                        }
-                      },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 8.h,
+                        ),
+                        CustomButton(
+                          width: Get.width * 0.3,
+                          text: 'Try again',
+                          onPressed: () async {
+                            try {
+                              await EasyLoading.show(status: 'Retrying...');
+                              await UserServices.getCurrentUser(
+                                userId: supabase.auth.currentUser!.id,
+                                controller: initializationController,
+                              );
+                              await Future.delayed(const Duration(seconds: 2),
+                                  () async {
+                                await EasyLoading.dismiss();
+                              });
+                            } catch (e) {
+                              await EasyLoading.showToast(
+                                'No stable internet connection, try again later.',
+                                duration: const Duration(
+                                  seconds: 5,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 );

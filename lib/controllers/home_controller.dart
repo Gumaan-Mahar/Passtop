@@ -23,6 +23,9 @@ class HomeController extends GetxController {
   ScrollController passwordsScrollController = ScrollController();
 
   RxBool isPasswordsFetching = false.obs;
+  RxBool hasPasswordsFetchError = false.obs;
+  RxBool isRetryingPasswordsFetch = false.obs;
+  RxString passwordsFetchErrorMessage = ''.obs;
   RxInt appsPasswordsTotal = 0.obs;
   RxInt browsersPasswordsTotal = 0.obs;
   RxInt paymentsPasswordsTotal = 0.obs;
@@ -36,32 +39,37 @@ class HomeController extends GetxController {
 
   @override
   void onInit() async {
-    isPasswordsFetching.value = true;
     final currentUser = supabase.auth.currentUser;
     if (currentUser != null) {
+      isPasswordsFetching.value = true;
       passwords.value = await PasswordsServices.fetchPasswords(
         userId: currentUser.id,
         encryptionKey: initializationController.encryptionKey.value!,
+        hasPasswordsFetchError: hasPasswordsFetchError,
+        isRetryingPasswordsFetch: isRetryingPasswordsFetch,
+        passwordsFetchErrorMessage: passwordsFetchErrorMessage,
       );
-      appsPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[0])
-          .length;
-      browsersPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[1])
-          .length;
-      paymentsPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[2])
-          .length;
-      identitiesPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[3])
-          .length;
-      addressesPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[4])
-          .length;
-      generalPasswordsTotal.value = passwords
-          .where((password) => password.category == categories[5])
-          .length;
       isPasswordsFetching.value = false;
+      if (passwords.isNotEmpty) {
+        appsPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[0])
+            .length;
+        browsersPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[1])
+            .length;
+        paymentsPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[2])
+            .length;
+        identitiesPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[3])
+            .length;
+        addressesPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[4])
+            .length;
+        generalPasswordsTotal.value = passwords
+            .where((password) => password.category == categories[5])
+            .length;
+      }
       PasswordsServices.subscribeToPasswordsChannel(
         passwords: passwords,
         homeController: this,
@@ -238,6 +246,15 @@ class HomeController extends GetxController {
     newPasswordAddressPostalCodeController.clear();
     newPasswordGeneralTextController.clear();
     newPasswordNotesController.clear();
+  }
+
+  void clearCategoryPasswordsQuantities() {
+    appsPasswordsTotal.value = 0;
+    browsersPasswordsTotal.value = 0;
+    paymentsPasswordsTotal.value = 0;
+    identitiesPasswordsTotal.value = 0;
+    addressesPasswordsTotal.value = 0;
+    generalPasswordsTotal.value = 0;
   }
 
   @override

@@ -17,6 +17,9 @@ class WatchTowerController extends GetxController {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   RxBool isFetching = false.obs;
+  RxBool hasPasswordsFetchError = false.obs;
+  RxBool isRetryingPasswordsFetch = false.obs;
+  RxString passwordsFetchErrorMessage = ''.obs;
 
   final InitializationController initializationController = Get.find();
 
@@ -25,14 +28,22 @@ class WatchTowerController extends GetxController {
     super.onInit();
     isFetching.value = true;
     final currentUser = supabase.auth.currentUser;
-    if (currentUser != null) {
-      passwords.value = await PasswordsServices.fetchPasswords(
-        userId: currentUser.id,
-        encryptionKey: initializationController.encryptionKey.value!,
-      );
+    try {
+      if (currentUser != null) {
+        passwords.value = await PasswordsServices.fetchPasswords(
+          userId: currentUser.id,
+          encryptionKey: initializationController.encryptionKey.value!,
+          hasPasswordsFetchError: hasPasswordsFetchError,
+          isRetryingPasswordsFetch: isRetryingPasswordsFetch,
+          passwordsFetchErrorMessage: passwordsFetchErrorMessage,
+        );
+      }
+      passwordsTotalScore.value = await calculateTotalScore();
+      isFetching.value = false;
+    } catch (e) {
+      await EasyLoading.showError(
+          'A network or server error occurred. Please try again.');
     }
-    passwordsTotalScore.value = await calculateTotalScore();
-    isFetching.value = false;
   }
 
   Future<double> calculateTotalScore() async {

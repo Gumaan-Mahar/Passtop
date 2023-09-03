@@ -7,6 +7,9 @@ class AppStrings {
   static const sessionExpiredSigninAgain =
       "Your session was expired. Please, log in again.";
 
+  static const initialScreenIssue =
+      "A network or server error occurred, please try again. If the issue still persists, contact us.";
+
   // Signin Screen
   static const signinScreenTitle =
       "Passwords made easy, security never compromised.";
@@ -26,8 +29,10 @@ class AppStrings {
       "Confirm password before you continue";
   static const setupApplockScreenPasswordsDontMatch = "Passwords don't match";
   static const setupApplockScreenContinueButton = "Continue";
-  static const setupApplockScreenErrorUpdatingMasterPassword =
+  static const setupApplockScreenGeneralError =
       "Sorry, something went wrong. Please, try again.";
+  static const setupApplockScreenErrorUpdatingMasterPassword =
+      "Sorry, something went wrong. Please, check your internet connection, and try again.";
 
   // Home Screen
   static const homeScreenNoRecentPasswords =

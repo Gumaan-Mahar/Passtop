@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:passtop/controllers/home_controller.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
@@ -7,7 +6,6 @@ import 'package:passtop/controllers/watch_tower_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 import 'package:passtop/core/instances.dart';
 import 'package:passtop/methods/validate_master_password.dart';
-import 'package:passtop/services/user_services.dart';
 import 'package:passtop/widgets/custom_button.dart';
 import 'package:passtop/widgets/custom_textfield.dart';
 
@@ -173,13 +171,14 @@ class ChangeMasterPasswordDialog extends StatelessWidget {
                     CustomButton(
                       width: Get.width * 0.8,
                       text: 'Save Changes',
+                      marginBottom: 16.h,
                       onPressed: () async {
                         await EasyLoading.show(status: 'Verifying...');
                         final isValid =
                             settingsController.formKey.currentState!.validate();
                         await EasyLoading.dismiss();
                         if (isValid) {
-                          await EasyLoading.show(status: 'Saving Changes');
+                          await EasyLoading.show(status: 'Saving Changes...');
                           try {
                             settingsController.migrateDataAfterPasswordChange(
                               newMasterPassword:

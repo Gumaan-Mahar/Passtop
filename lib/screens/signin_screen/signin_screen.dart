@@ -1,8 +1,8 @@
+
 import 'package:flutter/services.dart';
 import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/controllers/signin_controller.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
-import 'package:passtop/core/instances.dart';
 import 'package:passtop/core/resources/assets_manager/assets_manager.dart';
 import 'package:passtop/services/auth_services.dart';
 import 'package:passtop/widgets/button_loader.dart';
@@ -19,12 +19,6 @@ class SigninScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setSystemUIOverlayStyle(
-    //   SystemUiOverlayStyle(
-    //     systemNavigationBarColor: context.theme.scaffoldBackgroundColor,
-    //     statusBarColor: context.theme.scaffoldBackgroundColor,
-    //   ),
-    // );
     return Obx(
       () => initializationController.currentUser.value != null
           ? initializationController
@@ -32,14 +26,15 @@ class SigninScreen extends StatelessWidget {
               ? AppLockScreen()
               : SetupAppLockScreen()
           : AnnotatedRegion<SystemUiOverlayStyle>(
-              value: SystemUiOverlayStyle(
-                systemNavigationBarColor: context.theme.scaffoldBackgroundColor,
-                statusBarColor: context.theme.scaffoldBackgroundColor,
+              value: SystemUiOverlayStyle.light.copyWith(
+                statusBarColor: AppColors.customDarkColor,
+                systemNavigationBarColor: AppColors.customDarkColor,
               ),
               child: Scaffold(
                 body: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: Get.width * 0.03,
+                    vertical: Get.height * 0.04,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,18 +98,40 @@ class SigninScreen extends StatelessWidget {
                                             FlutterRemix.google_fill,
                                           ),
                                           onPressed: () async {
-                                            signinController
-                                                .isContinueButtonLoading
-                                                .value = true;
-                                            await AuthServices
-                                                .continueWithGoogle(
-                                              context: context,
-                                            );
-                                            supabase.auth.currentUser == null
-                                                ? signinController
+                                            try {
+                                              signinController
+                                                  .isContinueButtonLoading
+                                                  .value = true;
+                                              final result = await AuthServices
+                                                  .continueWithGoogle();
+                                              if (result != null) {
+                                              } else {
+                                                signinController
                                                     .isContinueButtonLoading
-                                                    .value = false
-                                                : null;
+                                                    .value = false;
+                                                await EasyLoading.showToast(
+                                                  'Google sign-in failed. Please try again',
+                                                  toastPosition:
+                                                      EasyLoadingToastPosition
+                                                          .top,
+                                                );
+                                              }
+                                            } catch (e) {
+                                              signinController
+                                                  .isContinueButtonLoading
+                                                  .value = false;
+                                              await EasyLoading.showToast(
+                                                'An unexpected error occurred. Please try again later.',
+                                                toastPosition:
+                                                    EasyLoadingToastPosition
+                                                        .top,
+                                              );
+                                            }
+                                            // supabase.auth.currentUser == null
+                                            //     ? signinController
+                                            //         .isContinueButtonLoading
+                                            //         .value = false
+                                            //     : null;
                                           },
                                         ),
                                       ),

@@ -1,8 +1,6 @@
-import 'package:passtop/controllers/initialization_controller.dart';
 import 'package:passtop/core/imports/core_imports.dart';
 import 'package:passtop/core/imports/packages_imports.dart';
 
-import '../services/user_services.dart';
 
 class SetupAppLockController extends GetxController {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();

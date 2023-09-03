@@ -44,7 +44,8 @@ class InitializationController extends GetxController {
         } else if (event.event == AuthChangeEvent.signedOut) {
           currentUser.value = null;
           await UserServices.unsubscribeFromCurrentUserChannel();
-        } else if (isTokenExpired(event.session?.expiresAt)) {
+        } 
+        else if (isTokenExpired(event.session?.expiresAt)) {
           await EasyLoading.show(status: AppStrings.sessionExpiredLoggingOut);
           await UserServices.signOut(
             controller: this,

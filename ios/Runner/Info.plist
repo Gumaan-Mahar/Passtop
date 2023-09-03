@@ -48,7 +48,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>io.supabase.passtop</string>
+				<string>com.example.passtop</string>
 		</array>
     </dict>
   </array>
